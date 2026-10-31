@@ -1,6 +1,17 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <title>Cintre</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Ta garde-robe dans ta poche : tes pièces, tes tenues, une tenue du jour selon la météo.">
+<meta name="theme-color" content="#F6F6F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#09090B" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cintre">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500&family=Instrument+Serif:ital@1&display=swap">
@@ -145,6 +156,15 @@ input.chip{outline-offset:0}
 .why li{display:flex;gap:8px}
 .why li::before{content:"";flex:none;width:6px;height:6px;margin-top:8px;border-radius:50%;background:var(--accent)}
 .ai-box{background:var(--accent-soft);border-radius:var(--r-sm);padding:14px 16px;font-size:14px;white-space:pre-wrap;min-height:1.5em}
+.wx-now{display:flex;align-items:center;gap:12px;background:var(--sunk);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px}
+.wx-t{font:600 26px/1 var(--f-display);letter-spacing:-.03em}
+.wx-d{flex:1;min-width:0;display:flex;flex-direction:column;font-size:14px;line-height:1.35}
+.wx-d .muted{font-size:12.5px}
+.wx-note{margin:0 0 10px;font-size:12px;color:var(--muted)}
+.wx-note.err{color:var(--bad)}
+.wx-set{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.wx-city{width:100%;text-align:left;background:none;border:0;padding:6px 0}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font-size:inherit}
 .weather{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .weather .chip{justify-content:center;flex-direction:column;border-radius:var(--r-sm);padding:10px 4px;gap:1px;box-shadow:none;background:var(--sunk)}
 .weather .chip[aria-pressed="true"]{background:var(--ink)}
@@ -639,6 +659,103 @@ const SHOPS = [
   ["Vinted", q=>`https://www.vinted.fr/catalog?search_text=${q}`]
 ];
 
+/* ---------- Météo automatique (Open-Meteo : gratuit, sans clé, sans compte) ---------- */
+const WX_KEY = "cintre.wx";
+const WX_RAIN = new Set([51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99]);
+const wx = { loc:null, data:null, busy:false, err:"", manual:false, edit:false, cities:null };
+try{ const s = JSON.parse(localStorage.getItem(WX_KEY)||"null"); if(s){ wx.loc = s.loc||null; wx.data = s.data||null; } }catch{}
+function wxSave(){ try{ localStorage.setItem(WX_KEY, JSON.stringify({loc:wx.loc, data:wx.data})); }catch{} }
+function wxStale(){ return !wx.data || wx.data.day!==today() || Date.now()-wx.data.at > 3*3600e3; }
+function wxBucket(t){ return t<10 ? "froid" : t<17 ? "frais" : t<24 ? "doux" : "chaud"; }
+function wxLabel(c){
+  if(c===0) return "Ciel dégagé"; if(c<=2) return "Éclaircies"; if(c===3) return "Couvert"; if(c===45||c===48) return "Brouillard";
+  if(c>=51&&c<=57) return "Bruine"; if(c>=61&&c<=67) return "Pluie"; if(c>=71&&c<=77) return "Neige"; if(c>=80&&c<=82) return "Averses";
+  if(c===85||c===86) return "Averses de neige"; if(c>=95) return "Orages"; return "Variable";
+}
+function wxApply(){
+  if(!wx.data || wx.manual || wx.data.day!==today()) return;
+  const J = ui.jour, w = wxBucket(wx.data.feel);
+  if(J.weather!==w || J.rain!==wx.data.rain){ J.weather = w; J.rain = wx.data.rain; J.picks = null; J.idx = 0; J.ai = ""; }
+}
+async function wxFetch(){
+  if(!wx.loc || wx.busy) return;
+  wx.busy = true; wx.err = ""; render();
+  try{
+    const {lat, lon} = wx.loc;
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,precipitation_sum&timezone=auto&forecast_days=1`);
+    if(!r.ok) throw 0;
+    const j = await r.json(), d = j.daily;
+    const pop = d.precipitation_probability_max?.[0] ?? 0, code = d.weather_code[0];
+    wx.data = { at:Date.now(), day:today(), now:Math.round(j.current?.temperature_2m ?? d.temperature_2m_max[0]),
+      min:Math.round(d.temperature_2m_min[0]), max:Math.round(d.temperature_2m_max[0]),
+      /* ressenti de la journée : pondéré vers l'après-midi, là où on passe le plus de temps dehors */
+      feel:Math.round((2*d.apparent_temperature_max[0] + d.apparent_temperature_min[0]) / 3),
+      pop, code, rain: pop>=50 || (d.precipitation_sum?.[0]||0)>=1 || WX_RAIN.has(code) };
+    wxSave(); wxApply();
+  }catch{ wx.err = "Météo indisponible pour l'instant (pas de connexion ?). Tu peux la régler à la main."; }
+  wx.busy = false; render();
+}
+function wxLocate(){
+  if(!navigator.geolocation){ wx.err = "Ton navigateur ne donne pas la position. Cherche ta ville."; render(); return; }
+  wx.busy = true; wx.err = ""; render();
+  navigator.geolocation.getCurrentPosition(p => {
+    wx.busy = false; wx.loc = {lat:+p.coords.latitude.toFixed(2), lon:+p.coords.longitude.toFixed(2), name:"Ma position"};
+    wx.manual = false; wx.edit = false; wx.cities = null; wxSave(); wxFetch();
+  }, e => {
+    wx.busy = false; wx.err = e.code===1 ? "Localisation refusée. Cherche ta ville à la place." : "Position introuvable. Cherche ta ville à la place."; render();
+  }, {timeout:12000, maximumAge:30*60e3});
+}
+async function wxSearch(q){
+  wx.busy = true; wx.err = ""; wx.cities = null; render();
+  try{
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=fr&format=json`);
+    if(!r.ok) throw 0;
+    const j = await r.json();
+    wx.cities = (j.results||[]).map(c => ({lat:+c.latitude.toFixed(2), lon:+c.longitude.toFixed(2), name:c.name, sub:[c.admin1, c.country].filter(Boolean).join(", ")}));
+    if(!wx.cities.length) wx.err = `Aucune ville trouvée pour « ${q} ».`;
+  }catch{ wx.err = "Recherche impossible pour l'instant (pas de connexion ?)."; }
+  wx.busy = false; render();
+}
+function wxBlock(){
+  const d = wx.data, fresh = d && d.day===today();
+  if(wx.loc && !wx.edit){
+    const head = fresh ? `<div class="wx-now"><div class="wx-t">${d.now}°</div><div class="wx-d"><b>${esc(wxLabel(d.code))}</b><span class="muted">${esc(wx.loc.name)} · ${d.min}° / ${d.max}° · ressenti ${d.feel}°${d.pop?` · pluie ${d.pop} %`:""}</span></div>${wx.busy?'<span class="spinner"></span>':`<button class="btn sm ghost" data-act="wx-change" aria-label="Changer de lieu">Lieu</button>`}</div>`
+      : `<div class="wx-now"><div class="wx-d"><b>${esc(wx.loc.name)}</b><span class="muted">${wx.busy?"Récupération de la météo…":"Pas de prévision pour aujourd'hui."}</span></div>${wx.busy?'<span class="spinner"></span>':`<button class="btn sm" data-act="wx-refresh">Actualiser</button><button class="btn sm ghost" data-act="wx-change">Lieu</button>`}</div>`;
+    const note = !fresh ? "" : wx.manual
+      ? `<p class="wx-note">Tu as réglé la météo à la main. <button class="linkbtn" data-act="wx-auto">Revenir à la prévision</button></p>`
+      : `<p class="wx-note">Réglée d'après la prévision du jour. Touche un autre choix pour forcer.</p>`;
+    return head + note + (wx.err?`<p class="wx-note err">${esc(wx.err)}</p>`:"");
+  }
+  return `<div class="wx-set">
+      <div class="row"><button class="btn sm primary" data-act="wx-loc" ${wx.busy?"disabled":""}>${wx.busy?'<span class="spinner"></span>':""}Utiliser ma position</button>${wx.loc?`<button class="btn sm ghost" data-act="wx-cancel">Annuler</button>`:""}</div>
+      <form class="row" data-form="wx" style="flex-wrap:nowrap"><input class="input" id="wx-q" placeholder="Ou cherche ta ville" autocomplete="off" enterkeyhint="search" style="flex:1;min-width:0;padding:9px 12px"><button class="btn sm" type="submit" ${wx.busy?"disabled":""}>OK</button></form>
+      ${wx.cities?`<div class="list">${wx.cities.map((c,k)=>`<button class="li wx-city" data-act="wx-city" data-v="${k}"><div class="body"><b>${esc(c.name)}</b><span class="muted" style="font-size:13px">${esc(c.sub)}</span></div></button>`).join("")}</div>`:""}
+      ${wx.err?`<p class="wx-note err">${esc(wx.err)}</p>`:`<p class="wx-note">Météo gratuite via Open-Meteo. Ta position n'est envoyée qu'à ce service, arrondie à ~1 km.</p>`}
+    </div>`;
+}
+document.addEventListener("submit", e => {
+  if(e.target.dataset.form !== "wx") return;
+  e.preventDefault(); const q = ($("#wx-q")?.value||"").trim(); if(q){ document.activeElement?.blur(); wxSearch(q); }
+});
+document.addEventListener("visibilitychange", () => { if(!document.hidden && wx.loc && wxStale()) wxFetch(); });
+
+/* ---------- Installation (PWA) ---------- */
+let installEvt = null;
+const isInstalled = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if(modal.render) modal.paint(); });
+addEventListener("appinstalled", () => { installEvt = null; toast("Cintre est installée sur ton écran d'accueil."); });
+function installBlock(){
+  if(!STANDALONE) return "";
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const body = isInstalled() ? `<span class="muted" style="font-size:13px">Cintre est installée. Elle s'ouvre en plein écran et fonctionne sans réseau (sauf la météo et les fonctions Claude).</span>`
+    : installEvt ? `<div class="row"><button class="btn sm primary" data-act="install">Installer Cintre</button></div><span class="muted" style="font-size:13px">Ajoute une icône sur ton écran d'accueil, ouverture en plein écran, utilisable hors connexion.</span>`
+    : ios ? `<span class="muted" style="font-size:13px">Dans Safari : bouton Partager, puis « Sur l'écran d'accueil ». L'app s'ouvrira en plein écran et fonctionnera hors connexion.</span>`
+    : `<span class="muted" style="font-size:13px">Dans le menu du navigateur : « Installer l'application » ou « Ajouter à l'écran d'accueil ».</span>`;
+  return `<div class="field"><span class="lab">Application</span>${body}</div>`;
+}
+if(STANDALONE && "serviceWorker" in navigator && window.isSecureContext && location.protocol!=="file:")
+  addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+
 /* ---------- Navigation ---------- */
 const TABS = [["dressing","Dressing"],["tenues","Tenues"],["jour","Aujourd'hui"],["envies","Envies"],["revente","Revente"]];
 const ui = { tab:"dressing", cat:"tous", color:"", season:"", sort:"recent", q:"", tenuesView:"liste", occFilter:"", calMonth:null,
@@ -749,14 +866,13 @@ function viewCalendar(){
 
 function viewJour(){
   const J = ui.jour;
-  const head = `${brandMobile()}<div class="head"><div><h1>Tenue du <span class="s">jour</span></h1><p style="text-transform:capitalize">${fmtDate(today())}</p></div></div>`;
+  const head = `${brandMobile()}<div class="head"><div><h1>Tenue du <span class="s">jour</span></h1><p><span style="text-transform:capitalize">${fmtDate(today())}</span>${wx.data&&wx.data.day===today()&&wx.loc?` · ${wx.data.now}°, ${esc(wxLabel(wx.data.code).toLowerCase())} · ${esc(wx.loc.name)}`:""}</p></div></div>`;
   const can = baseCombos().length;
   const controls = `<div class="panel stack">
-      <div><div class="mono muted" style="margin-bottom:8px">Météo</div><div class="weather">${Object.entries(WEATHER).map(([k,v])=>`<button class="chip" data-act="j-w" data-v="${k}" aria-pressed="${J.weather===k}">${v.label}<b>${v.range}</b></button>`).join("")}</div>
+      <div><div class="mono muted" style="margin-bottom:8px">Météo</div>${wxBlock()}<div class="weather">${Object.entries(WEATHER).map(([k,v])=>`<button class="chip" data-act="j-w" data-v="${k}" aria-pressed="${J.weather===k}">${v.label}<b>${v.range}</b></button>`).join("")}</div>
       <label class="row" style="margin-top:10px;font-size:14px"><input type="checkbox" id="j-rain" ${J.rain?"checked":""} style="width:18px;height:18px;accent-color:var(--accent)"> Pluie prévue</label></div>
       <div><div class="mono muted" style="margin-bottom:8px">Occasion</div><div class="chips">${Object.entries(OCCASIONS).map(([k,v])=>`<button class="chip" data-act="j-o" data-v="${k}" aria-pressed="${J.occ===k}">${v.label}</button>`).join("")}</div></div>
       <button class="btn primary" data-act="j-go" ${can?"":"disabled"}>${ICONS.spark}Proposer une tenue</button>
-      <p class="muted" style="margin:0;font-size:12px">La météo se règle à la main dans ce prototype (pas encore de connexion à un service météo).</p>
     </div>`;
   if(!can) return head + `<div class="today"><div class="panel empty"><h2>Il manque des pièces</h2><p>Pour composer une tenue, l'app a besoin d'au moins un haut, un bas et une paire de chaussures (ou une robe et des chaussures).</p><div class="row"><button class="btn primary" data-act="add">Ajouter des vêtements</button>${!items().length?`<button class="btn" data-act="demo">Charger l'exemple</button>`:""}</div></div>${controls}</div>` + missingBlock();
   if(!J.picks) J.picks = suggest(J);
@@ -821,7 +937,7 @@ function mSettings(){
     <span class="muted" style="font-size:13px">Active les tags automatiques, le scan en lot, l'avis de styliste, les annonces et la recherche en boutique. Crée une clé sur console.anthropic.com (facturation à l'usage, quelques centimes par photo ou recherche). La clé reste dans ce navigateur et n'est envoyée qu'à l'API Claude. Ne l'utilise que sur ton propre appareil.</span></div>
     <div class="row" style="margin-bottom:18px">${k?`<button class="btn sm danger" data-act="key-del">Retirer la clé</button>`:""}<span class="muted" style="font-size:13px">${k?"Clé enregistrée.":"Aucune clé enregistrée."}</span></div>
     <div class="field"><span class="lab">Sauvegarde</span><div class="row"><button class="btn sm" data-act="export">Exporter mes données</button><label class="btn sm">Importer une sauvegarde<input class="vh" type="file" id="import-file" accept="application/json,.json"></label></div>
-    <span class="muted" style="font-size:13px">Tes données vivent dans ce navigateur : si tu vides l'historique du navigateur, elles disparaissent. Exporte-les pour les garder ou les passer sur un autre appareil.</span></div>`;
+    <span class="muted" style="font-size:13px">Tes données vivent dans ce navigateur : si tu vides l'historique du navigateur, elles disparaissent. Exporte-les pour les garder ou les passer sur un autre appareil.</span></div>${installBlock()}`;
 }
 
 function viewRevente(){
@@ -1027,7 +1143,7 @@ async function aiOpinion(){
   const desc = p.pieces.map(i=>`- ${CATS[i.category].one} : ${i.name}${i.brand?` (${i.brand})`:""}, ${(i.colors||[]).map(c=>COLOR_LABEL[c]).join("/")}${i.material?`, ${i.material}`:""}`).join("\n");
   const other = items().filter(i=>!p.pieces.includes(i)).slice(0,40).map(i=>`${i.name} (${CATS[i.category].one}, ${(i.colors||[]).map(c=>COLOR_LABEL[c]).join("/")})`).join("; ");
   try{
-    await store.ai(`Tu es un styliste franc et concret. Météo : ${WEATHER[J.weather].label.toLowerCase()} (${WEATHER[J.weather].range})${J.rain?", pluie":""}. Occasion : ${OCCASIONS[J.occ].label}.\nTenue proposée :\n${desc}\n\nAutres pièces disponibles : ${other||"aucune"}.\n\nEn 4 phrases maximum, en français, sans titre ni liste : dis si la tenue fonctionne et pourquoi, propose un ajustement précis avec une pièce disponible si c'est utile, et donne un conseil de port (rentrer, retrousser, superposer…).`,
+    await store.ai(`Tu es un styliste franc et concret. Météo : ${WEATHER[J.weather].label.toLowerCase()} (${WEATHER[J.weather].range})${wx.data&&!wx.manual&&wx.data.day===today()?`, ${wx.data.min} à ${wx.data.max} °C, ${wxLabel(wx.data.code).toLowerCase()}`:""}${J.rain?", pluie":""}. Occasion : ${OCCASIONS[J.occ].label}.\nTenue proposée :\n${desc}\n\nAutres pièces disponibles : ${other||"aucune"}.\n\nEn 4 phrases maximum, en français, sans titre ni liste : dis si la tenue fonctionne et pourquoi, propose un ajustement précis avec une pièce disponible si c'est utile, et donne un conseil de port (rentrer, retrousser, superposer…).`,
       {modelTier:"quick", onText:({text})=>{ J.ai = text; const b=$("#ai-box"); if(b) b.textContent = text; }});
   }catch(e){ J.ai = aiError(e); }
   J.aiBusy = false; render();
@@ -1133,13 +1249,20 @@ document.addEventListener("click", async e => {
     case "o-del": modal.close(); await del("outfit", id); toast("Tenue supprimée."); break;
     case "fav": { const o = DB.outfits.get(id); await put({...o, fav:!o.fav}); break; }
     case "wear-outfit": { const o = DB.outfits.get(id); await logWear(o.itemIds, o.id); toast("Noté pour aujourd'hui."); break; }
-    case "j-w": ui.jour.weather = v; ui.jour.picks = null; ui.jour.idx = 0; ui.jour.ai=""; render(); break;
+    case "j-w": wx.manual = !!wx.data; ui.jour.weather = v; ui.jour.picks = null; ui.jour.idx = 0; ui.jour.ai=""; render(); break;
     case "j-o": ui.jour.occ = v; ui.jour.picks = null; ui.jour.idx = 0; ui.jour.ai=""; render(); break;
     case "j-go": ui.jour.picks = suggest(ui.jour); ui.jour.idx = 0; ui.jour.ai=""; render(); break;
     case "j-next": { const J = ui.jour; J.ai=""; if(J.idx < J.picks.length-1) J.idx++; else { J.picks = suggest(J); J.idx = 0; } render(); break; }
     case "j-wear": { const p = ui.jour.picks[ui.jour.idx]; await logWear(p.pieces.map(i=>i.id)); toast("Bonne journée ! Tenue notée dans le calendrier."); break; }
     case "j-save": { const p = ui.jour.picks[ui.jour.idx]; await put({kind:"outfit", id:uid("outfit"), name:`${OCCASIONS[ui.jour.occ].label} · ${WEATHER[ui.jour.weather].label.toLowerCase()}`, itemIds:p.pieces.map(i=>i.id), occasion:ui.jour.occ, seasons:WEATHER[ui.jour.weather].seasons.slice(0,2), fav:false, createdAt:new Date().toISOString()}); toast("Tenue sauvegardée dans « Tenues »."); break; }
     case "j-ai": aiOpinion(); break;
+    case "wx-loc": wxLocate(); break;
+    case "wx-city": wx.loc = wx.cities[+v]; wx.cities = null; wx.edit = false; wx.manual = false; wx.data = null; wxSave(); wxFetch(); break;
+    case "wx-change": wx.edit = true; wx.err = ""; render(); break;
+    case "wx-cancel": wx.edit = false; wx.err = ""; wx.cities = null; render(); break;
+    case "wx-refresh": wxFetch(); break;
+    case "wx-auto": wx.manual = false; wxApply(); render(); break;
+    case "install": if(installEvt){ installEvt.prompt(); installEvt.userChoice.finally(()=>{ installEvt = null; if(modal.render) modal.paint(); }); } break;
     case "settings": modal.open(mSettings); break;
     case "key-del": saveKey(""); toast("Clé retirée."); break;
     case "export": {
@@ -1166,7 +1289,7 @@ document.addEventListener("change", e => {
   else if(t.id==="f-color"){ ui.color = t.value; render(); }
   else if(t.id==="f-season"){ ui.season = t.value; render(); }
   else if(t.id==="f-sort"){ ui.sort = t.value; render(); }
-  else if(t.id==="j-rain"){ ui.jour.rain = t.checked; ui.jour.picks = null; ui.jour.idx=0; render(); }
+  else if(t.id==="j-rain"){ wx.manual = !!wx.data; ui.jour.rain = t.checked; ui.jour.picks = null; ui.jour.idx=0; render(); }
   else if(t.id==="ed-cat"){ readEditFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
   else if(t.dataset.act==="b-tog"){ s.found[+t.dataset.v].keep = t.checked; modal.paint(); }
 });
@@ -1207,7 +1330,8 @@ window.addEventListener("hashchange", ()=>{ const h = location.hash.slice(1); if
 
 (function boot(){
   const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h)) ui.tab = h;
-  render(); initStore();
+  wxApply(); render(); initStore();
+  if(wx.loc && wxStale()) wxFetch();
 })();
 </script>
 
