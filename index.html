@@ -258,12 +258,115 @@ textarea.input{min-height:160px;resize:vertical}
 .res .body b{display:block;font-weight:600}
 .res .price{font-weight:700;font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.02em}
 form .input[type=search]{box-shadow:none;background:var(--sunk)}
+/* ---------- Accès : connexion / inscription ---------- */
+:root{--hero-accent:#A5A0FF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--hero-accent:#4F46E5}}
+:root[data-theme="dark"]{--hero-accent:#4F46E5}
+.eyebrow{font:500 11.5px/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.gate{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:calc(28px + env(safe-area-inset-top,0px)) 18px calc(28px + env(safe-area-inset-bottom,0px))}
+.gate-card{width:100%;max-width:420px;display:flex;flex-direction:column;gap:20px}
+.gate .brand{margin:0;font-size:26px}
+.gate .brand svg{width:30px;height:30px}
+.gate h1{font-size:clamp(40px,11vw,54px);line-height:.98;letter-spacing:-.045em}
+.gate h1 .s{color:var(--accent);font-size:1.08em}
+.gate-lead{margin:12px 0 0;color:var(--muted)}
+.gate .seg{align-self:flex-start}
+.gate-status{font-size:13px;color:var(--muted);min-height:1.4em;margin:12px 0 0}
+.gate-status.err{color:var(--bad)}
+.gate-foot{font-size:12px;color:var(--muted);text-align:center;margin:0}
+
+/* ---------- Compte ---------- */
+.mobile-brand{justify-content:space-between}
+.avatar{width:38px;height:38px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 15px/1 var(--f-display);flex:none;padding:0}
+.avatar.guest{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.avatar svg{width:20px;height:20px}
+.side-account{margin-top:auto;display:flex;align-items:center;gap:10px;border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:var(--r-sm);padding:10px 12px;text-align:left;width:100%}
+.side-account .body{flex:1;min-width:0;display:flex;flex-direction:column;font-size:12.5px;line-height:1.35}
+.side-account b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:7px;vertical-align:1px;flex:none}
+.sync-dot.pending{background:var(--warn)}
+.sync-dot.err{background:var(--bad)}
+.sync-line{display:flex;align-items:baseline;font-size:14px}
+
+/* ---------- Accueil ---------- */
+.home-grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:760px){.home-grid{grid-template-columns:1.25fr 1fr}}
+.hero{position:relative;overflow:hidden;background:var(--ink);color:var(--bg);border-radius:var(--r);padding:24px 22px;display:flex;flex-direction:column;gap:14px;justify-content:flex-end;min-height:230px;box-shadow:var(--shadow)}
+.hero .eyebrow{color:inherit;opacity:.6}
+.hero h2{font-size:clamp(30px,7.5vw,42px);line-height:1;letter-spacing:-.045em;position:relative}
+.hero h2 .s{color:var(--hero-accent);font-size:1.06em}
+.hero p{margin:0;opacity:.72;max-width:34ch;position:relative}
+.hero .btn{align-self:flex-start;background:var(--bg);color:var(--ink);position:relative}
+.hero-deco{position:absolute;right:-34px;top:-26px;width:190px;height:190px;opacity:.13;pointer-events:none}
+.hscroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,44%);gap:12px;overflow-x:auto;padding:2px 2px 12px;margin:0 -2px;scrollbar-width:none;scroll-snap-type:x mandatory}
+.hscroll::-webkit-scrollbar{display:none}
+.hscroll>*{scroll-snap-align:start}
+.hscroll.wide{grid-auto-columns:minmax(220px,72%)}
+@media (min-width:760px){.hscroll{grid-auto-columns:minmax(170px,1fr)}.hscroll.wide{grid-auto-columns:minmax(240px,1fr)}}
+.linkmore{background:none;border:0;color:var(--accent);font-weight:600;font-size:14px;padding:4px 0;white-space:nowrap}
+.back{display:inline-flex;margin:-6px 0 10px}
+@media (min-width:900px){.back{display:none}}
+.shortcuts{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:600px){.shortcuts{grid-template-columns:1fr 1fr}}
+.shortcut{display:flex;align-items:center;gap:14px;border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:var(--r);padding:16px 18px;text-align:left;width:100%}
+.shortcut .ic{width:44px;height:44px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.shortcut .ic svg{width:22px;height:22px}
+.shortcut .body{flex:1;min-width:0;display:flex;flex-direction:column}
+.shortcut .body span{font-size:13px;color:var(--muted)}
+
+/* ---------- Wishlist ---------- */
+.wish-card{gap:6px;padding-bottom:12px}
+.wish-card .name,.wish-card .meta,.wish-card .wfit,.wish-card .wnote,.wish-card .wact{padding:0 8px}
+.wbtn{all:unset;cursor:pointer;display:block;border-radius:var(--r-sm)}
+.wbtn:focus-visible{outline:2px solid var(--accent)}
+.wprice{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:700}
+.wfit{font-size:12.5px;color:var(--muted)}
+.wfit b{color:var(--accent);font-weight:700}
+.wnote{font-size:12px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wact{margin-top:4px;flex-wrap:nowrap;gap:6px}
+.wact .btn{padding:6px 11px;font-size:12.5px;flex:1 1 0;min-width:0}
+.today-mini{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.today-mini .piece{padding:4px 4px 8px;gap:6px}
+.today-mini .piece .name{font-size:11.5px;padding:0 4px}
+@media (min-width:760px){.today-mini{gap:8px}.today-mini .piece .name{font-size:13px}}
+.crop{position:relative;width:100%;max-width:280px;aspect-ratio:1;margin:0 auto;border-radius:var(--r-sm);overflow:hidden;background:var(--swatch);touch-action:none;cursor:grab;box-shadow:var(--shadow)}
+.crop.dragging{cursor:grabbing}
+.crop[data-fixed]{cursor:default}
+.crop img{position:absolute;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none;object-fit:cover}
+.crop .ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;padding:24px}
+.crop .ph svg{width:34px;height:34px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.slot .strip button{position:relative}
+.wtag{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.wtag svg{width:12px;height:12px}
+
+/* ---------- Styliste ---------- */
+.chat{display:flex;flex-direction:column;gap:10px}
+.msg{max-width:88%;padding:11px 15px;border-radius:20px;font-size:14.5px;line-height:1.5;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--bg);border-bottom-right-radius:6px;white-space:pre-wrap}
+.msg.ai{align-self:flex-start;background:var(--surface);box-shadow:var(--shadow);border-bottom-left-radius:6px}
+.msg.ai p{margin:0 0 8px}
+.msg.ai p:last-child{margin:0}
+.msg.ai ul{margin:2px 0 8px;padding-left:18px}
+.msg.ai ul:last-child{margin-bottom:0}
+.msg.err{color:var(--bad)}
+.composer{position:sticky;bottom:calc(88px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:flex-end;background:var(--glass);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);padding:7px 7px 7px 10px;border-radius:26px;box-shadow:var(--shadow-lg);border:1px solid var(--line);margin-top:16px;z-index:5}
+@media (min-width:900px){.composer{bottom:20px}}
+.composer textarea{flex:1;min-width:0;border:0;background:transparent;resize:none;padding:9px 4px;max-height:140px;font-size:16px;line-height:1.4}
+.composer textarea:focus{outline:none}
+.composer .btn{padding:0;width:42px;height:42px;flex:none}
+.prompts{display:grid;gap:8px;grid-template-columns:1fr}
+@media (min-width:600px){.prompts{grid-template-columns:1fr 1fr}}
+.prompt{border:0;background:var(--sunk);border-radius:var(--r-sm);padding:13px 15px;text-align:left;font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.prompt span:last-child{color:var(--accent)}
 </style>
 
+<div id="gate" class="gate" hidden></div>
 <div class="app">
   <nav class="side" aria-label="Navigation">
     <div class="brand"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 9a3 3 0 1 1 3-3"/><path d="M16 9v3L4 21a2 2 0 0 0 1.2 3.6h21.6A2 2 0 0 0 28 21L16 12"/></svg><span>Cintre<i>.</i></span></div>
     <div id="side-tabs" class="stack" style="gap:4px"></div>
+    <div id="side-account" style="margin-top:auto;padding-top:16px"></div>
   </nav>
   <main id="view" aria-live="polite"></main>
   <nav class="tabs" id="tabs" aria-label="Navigation"></nav>
@@ -385,6 +488,10 @@ const ICONS = {
   x:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   star:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.5 2.9 1-6.1L3.2 9.5l6.1-.9Z"/></svg>',
   starO:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.5 2.9 1-6.1L3.2 9.5l6.1-.9Z"/></svg>',
+  accueil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5.5v-6h-5v6H4Z"/></svg>',
+  styliste:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9.5L4 20Z"/><path d="m12 7.3.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z" fill="currentColor" stroke="none"/></svg>',
+  send:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
   spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg>'
 };
 
@@ -396,31 +503,31 @@ function ingest(docs){
   for(const m of Object.values(DB)) m.clear();
   for(const [id, d] of docs){ const k = KIND_OF[d.kind]; if(k) DB[k].set(id, {...d, id}); }
 }
-function localLoad(){ try{ return JSON.parse(localStorage.getItem("cintre.v1")||"{}"); }catch{ return {}; } }
+function localLoad(){ return LS.get(cacheKey(), {}) || {}; }
+let storageWarned = false;
 function localSave(){
-  try{
-    const all = {}; for(const m of Object.values(DB)) for(const [id,d] of m) all[id]=d;
-    localStorage.setItem("cintre.v1", JSON.stringify(all));
-  }catch(e){ toast("Stockage du navigateur plein : retire des photos ou utilise l'app connectée."); }
+  const all = {}; for(const m of Object.values(DB)) for(const [id,d] of m) all[id]=d;
+  if(!LS.set(cacheKey(), all) && !storageWarned){ storageWarned = true; toast(store.mode==="cloud" ? "Mémoire du navigateur pleine : tes données restent dans ton compte, mais l'accès hors ligne est limité." : "Stockage du navigateur plein : retire des photos ou crée un compte."); }
 }
-async function put(doc){
-  const k = KIND_OF[doc.kind]; DB[k].set(doc.id, doc);
-  if(store.mode==="db"){
-    try{ const {id, ...data} = doc; await store.col.doc(doc.id).set(data); }
-    catch(e){ toast("Enregistrement refusé : " + (e.code||"erreur")); }
-  } else localSave();
+/* Enregistre / supprime un lot d'éléments, quel que soit le mode (base Claude, compte Supabase, appareil) */
+async function saveMany(docs){
+  for(const d of docs){ const k = KIND_OF[d.kind]; if(k) DB[k].set(d.id, d); }
   render();
+  if(store.mode==="db"){ for(const d of docs){ const {id, ...data} = d; try{ await store.col.doc(id).set(data); }catch(e){ toast("Enregistrement refusé : " + (e.code||"erreur")); break; } } }
+  else { localSave(); if(store.mode==="cloud") queue(docs.map(d => ({op:"put", id:d.id}))); }
 }
-async function del(kind, id){
-  DB[KIND_OF[kind]].delete(id);
-  if(store.mode==="db"){ try{ await store.col.doc(id).delete(); }catch(e){ toast("Suppression refusée."); } }
-  else localSave();
+async function removeMany(ids){
+  for(const id of ids) for(const m of Object.values(DB)) m.delete(id);
   render();
+  if(store.mode==="db"){ for(const id of ids){ try{ await store.col.doc(id).delete(); }catch(e){ toast("Suppression refusée."); break; } } }
+  else { localSave(); if(store.mode==="cloud") queue(ids.map(id => ({op:"del", id}))); }
 }
+async function put(doc){ await saveMany([doc]); }
+async function del(kind, id){ await removeMany([id]); }
 async function initStore(){
   const use = n => (window.claude && window.claude.use) ? window.claude.use(n).catch(()=>null) : Promise.resolve(null);
-  if(STANDALONE){ if(getKey()){ store.ai = makeApiAI(); store.aiImages = true; store.web = true; } }
-  else use("sample").then(async s => {
+  if(STANDALONE){ if(getKey()){ store.ai = makeApiAI(); store.aiImages = true; store.web = true; } startStandalone(); return; }
+  use("sample").then(async s => {
     store.ai = s;
     if(s){ const lim = await s.limits().catch(()=>null); store.aiImages = !!(lim && lim.images); }
     render();
@@ -454,7 +561,7 @@ function wearStats(){
   }
   return s;
 }
-function outfitItems(o){ return (o.itemIds||[]).map(id=>DB.items.get(id)).filter(Boolean); }
+function outfitItems(o){ return (o.itemIds||[]).map(id=>DB.items.get(id)||DB.wish.get(id)).filter(Boolean); }
 function colorScore(list){
   const acc = [...new Set(list.map(i=>(i.colors||[])[0]).filter(c=>c && !NEUTRAL.has(c)))];
   let s;
@@ -728,7 +835,7 @@ function wxBlock(){
   }
   return `<div class="wx-set">
       <div class="row"><button class="btn sm primary" data-act="wx-loc" ${wx.busy?"disabled":""}>${wx.busy?'<span class="spinner"></span>':""}Utiliser ma position</button>${wx.loc?`<button class="btn sm ghost" data-act="wx-cancel">Annuler</button>`:""}</div>
-      <form class="row" data-form="wx" style="flex-wrap:nowrap"><input class="input" id="wx-q" placeholder="Ou cherche ta ville" autocomplete="off" enterkeyhint="search" style="flex:1;min-width:0;padding:9px 12px"><button class="btn sm" type="submit" ${wx.busy?"disabled":""}>OK</button></form>
+      <form class="row" data-form="wx" style="flex-wrap:nowrap"><input class="input" id="wx-q" value="${esc(wx.q||"")}" placeholder="Ou cherche ta ville" autocomplete="off" enterkeyhint="search" style="flex:1;min-width:0;padding:9px 12px"><button class="btn sm" type="submit" ${wx.busy?"disabled":""}>OK</button></form>
       ${wx.cities?`<div class="list">${wx.cities.map((c,k)=>`<button class="li wx-city" data-act="wx-city" data-v="${k}"><div class="body"><b>${esc(c.name)}</b><span class="muted" style="font-size:13px">${esc(c.sub)}</span></div></button>`).join("")}</div>`:""}
       ${wx.err?`<p class="wx-note err">${esc(wx.err)}</p>`:`<p class="wx-note">Météo gratuite via Open-Meteo. Ta position n'est envoyée qu'à ce service, arrondie à ~1 km.</p>`}
     </div>`;
@@ -756,20 +863,527 @@ function installBlock(){
 if(STANDALONE && "serviceWorker" in navigator && window.isSecureContext && location.protocol!=="file:")
   addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 
+/* ---------- Comptes et synchronisation (Supabase) ---------- */
+/* Identifiant + mot de passe : l'identifiant devient une adresse technique, jamais utilisée pour envoyer d'e-mail.
+   Chaque élément (pièce, tenue, envie, jour porté) est une ligne de la table cintre_docs, protégée par RLS.
+   Les modifications passent par une file d'attente locale : l'app marche hors ligne et envoie tout au retour du réseau. */
+const CLOUD = { url:"https://zvxzzojzbytyrndangro.supabase.co", key:"sb_publishable_eEKRAWqzY7YAotnRhkPzJg_6WRx-AbZ",
+  domain:"users.vestia.invalid", table:"cintre_docs", sdk:"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" };
+const LS = {
+  get(k, d=null){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch{ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch{ return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch{} }
+};
+const auth = { tab:"login", busy:false, status:"", err:false, form:{}, user:null };
+let sbPromise = null;
+function supa(){
+  if(!sbPromise) sbPromise = import(CLOUD.sdk)
+    .then(m => m.createClient(CLOUD.url, CLOUD.key, {auth:{persistSession:true, autoRefreshToken:true, storageKey:"cintre-auth"}}))
+    .catch(e => { sbPromise = null; throw e; });
+  return sbPromise;
+}
+function usernameToEmail(u){
+  const v = String(u||"").trim().toLowerCase();
+  if(v.length<3 || v.length>40 || !/^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])$/.test(v) || v.includes("..")) return "";
+  return `${v}@${CLOUD.domain}`;
+}
+function userFromSession(u){
+  const m = u.user_metadata || {}; const username = m.username || String(u.email||"").split("@")[0];
+  return {id:u.id, username, name: m.display_name || m.name || username};
+}
+const initial = n => (String(n||"?").trim()[0] || "?").toUpperCase();
+const cacheKey = () => store.mode==="cloud" && auth.user ? `cintre.cloud.${auth.user.id}` : "cintre.v1";
+const outboxKey = () => `cintre.outbox.${auth.user?.id}`;
+const isNetErr = e => !navigator.onLine || /fetch|network|load failed|timeout/i.test(String(e?.message||e||""));
+
+/* File d'attente : {id: {op:"put"|"del", t}} — la dernière opération sur un élément gagne. */
+function queue(ops){
+  const box = LS.get(outboxKey(), {}) || {};
+  for(const o of ops) box[o.id] = {op:o.op, t:Date.now() + Math.random()};
+  LS.set(outboxKey(), box); store.pending = Object.keys(box).length; flushSoon();
+}
+let flushTimer = null, flushing = false;
+function flushSoon(ms=400){ clearTimeout(flushTimer); flushTimer = setTimeout(flush, ms); }
+function findDoc(id){ for(const m of Object.values(DB)) if(m.has(id)) return m.get(id); return null; }
+async function flush(){
+  if(store.mode!=="cloud" || flushing || !auth.user) return;
+  const snap = LS.get(outboxKey(), {}) || {}; const ids = Object.keys(snap);
+  store.pending = ids.length;
+  if(!ids.length){ setSync("ok"); return; }
+  if(!navigator.onLine){ setSync("offline"); return; }
+  flushing = true; setSync("syncing");
+  const done = list => { const box = LS.get(outboxKey(), {}) || {}; for(const id of list) if(box[id] && snap[id] && box[id].t===snap[id].t) delete box[id]; LS.set(outboxKey(), box); store.pending = Object.keys(box).length; };
+  try{
+    const sb = await supa(); const uid = auth.user.id;
+    const puts = ids.filter(id => snap[id].op==="put").map(findDoc).filter(Boolean);
+    const orphan = ids.filter(id => snap[id].op==="put" && !findDoc(id));
+    const dels = ids.filter(id => snap[id].op==="del");
+    for(let k=0; k<puts.length; k+=20){
+      const rows = puts.slice(k, k+20).map(d => { const {id, ...data} = d; return {user_id:uid, id, kind:d.kind, data, updated_at:new Date().toISOString()}; });
+      const {error} = await sb.from(CLOUD.table).upsert(rows, {onConflict:"user_id,id"});
+      if(error) throw error;
+      done(rows.map(r=>r.id));
+    }
+    if(dels.length){ const {error} = await sb.from(CLOUD.table).delete().eq("user_id", uid).in("id", dels); if(error) throw error; done(dels); }
+    done(orphan);
+    setSync("ok");
+  }catch(e){ setSync(isNetErr(e) ? "offline" : "error", e); }
+  flushing = false;
+  if(store.sync==="ok" && store.pending) flushSoon(200);
+}
+async function cloudPull(){
+  const sb = await supa(); const uid = auth.user.id; const rows = [];
+  for(let from=0;; from+=500){
+    const {data, error} = await sb.from(CLOUD.table).select("id,kind,data").eq("user_id", uid).range(from, from+499);
+    if(error) throw error;
+    rows.push(...data); if(data.length < 500) break;
+  }
+  const box = LS.get(outboxKey(), {}) || {}; const merged = {};
+  for(const r of rows) merged[r.id] = {...r.data, kind:r.kind, id:r.id};
+  for(const [id, e] of Object.entries(box)){ const d = findDoc(id); if(e.op==="put" && d) merged[id] = d; else if(e.op==="del") delete merged[id]; }
+  ingest(Object.entries(merged)); localSave(); store.pulledAt = Date.now(); ui.jour.picks = null; render();
+}
+async function syncNow(){
+  if(store.mode!=="cloud") return;
+  setSync("syncing");
+  try{ await cloudPull(); await flush(); }
+  catch(e){ setSync(isNetErr(e) ? "offline" : "error", e); }
+}
+function syncErrText(e){
+  const m = String(e?.message||"") + " " + String(e?.code||"");
+  if(/42P01|PGRST205|does not exist|Could not find the table/i.test(m)) return "La table Cintre n'existe pas encore dans Supabase : lance le script supabase/cintre.sql.";
+  if(/JWT|401|permission|policy|42501/i.test(m)) return "Supabase a refusé l'accès. Reconnecte-toi ; si ça persiste, relance le script supabase/cintre.sql.";
+  return "Synchronisation impossible (" + m.trim().slice(0,90) + ").";
+}
+function setSync(state, e){ store.sync = state; store.syncErr = state==="error" ? syncErrText(e) : ""; paintSync(); }
+function syncHTML(){
+  if(store.mode!=="cloud") return `<div class="sync-line"><span class="sync-dot pending"></span><span>Sans compte : données sur cet appareil uniquement.</span></div>`;
+  const n = store.pending || 0;
+  if(store.sync==="syncing") return `<div class="sync-line"><span class="spinner" style="width:12px;height:12px;margin-right:8px"></span><span>Synchronisation…</span></div>`;
+  if(store.sync==="offline") return `<div class="sync-line"><span class="sync-dot pending"></span><span>Hors ligne${n?` · ${n} modification${n>1?"s":""} en attente, envoyée${n>1?"s":""} au retour du réseau`:""}.</span></div>`;
+  if(store.sync==="error") return `<div class="sync-line"><span class="sync-dot err"></span><span>${esc(store.syncErr)}</span></div>`;
+  return `<div class="sync-line"><span class="sync-dot"></span><span>À jour · tes données sont sauvegardées dans ton compte.</span></div>`;
+}
+function syncShort(){
+  if(store.mode!=="cloud") return "Se connecter";
+  return {syncing:"Synchronisation…", offline:"Hors ligne", error:"Erreur de synchro"}[store.sync] || "Synchronisé";
+}
+function paintSync(){
+  document.querySelectorAll(".js-sync").forEach(el => el.innerHTML = syncHTML());
+  document.querySelectorAll(".js-sync-short").forEach(el => el.textContent = syncShort());
+}
+
+/* Démarrage de la version hébergée */
+function startStandalone(){
+  const last = LS.get("cintre.user");
+  if(last && last.id){ enterCloud(last, false); verifySession(); }
+  else if(LS.get("cintre.guest")) enterGuest();
+  else { showGate(""); supa().catch(()=>{}); }
+}
+function enterGuest(){
+  auth.user = null; chat.list = null; store.mode = "local"; store.loaded = true;
+  ingest(Object.entries(localLoad())); hideGate(); ui.jour.picks = null; render();
+}
+function enterCloud(user, fresh){
+  auth.user = user; chat.list = null; LS.set("cintre.user", user); LS.del("cintre.guest");
+  store.mode = "cloud"; store.loaded = true; store.sync = "ok";
+  ingest(Object.entries(localLoad()));
+  store.pending = Object.keys(LS.get(outboxKey(), {}) || {}).length;
+  hideGate(); ui.jour.picks = null; render();
+  if(fresh) syncNow();
+}
+async function verifySession(){
+  try{
+    const sb = await supa();
+    const {data, error} = await sb.auth.getSession(); const session = data?.session;
+    if(session && session.user.id===auth.user.id){ auth.user = {...auth.user, ...userFromSession(session.user)}; LS.set("cintre.user", auth.user); render(); syncNow(); }
+    else if(!error && !session) showGate("Ta session a expiré : reconnecte-toi.");
+    else if(error && error.status>=400 && error.status<500) showGate("Ta session a expiré : reconnecte-toi.");
+    else setSync("offline");
+  }catch{ setSync("offline"); }
+}
+function showGate(msg){
+  modal.close(); auth.status = msg || ""; auth.err = false; auth.busy = false;
+  document.querySelector(".app").hidden = true; renderGate();
+}
+function hideGate(){ const g = $("#gate"); g.hidden = true; g.innerHTML = ""; document.querySelector(".app").hidden = false; }
+const HANGER = '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 9a3 3 0 1 1 3-3"/><path d="M16 9v3L4 21a2 2 0 0 0 1.2 3.6h21.6A2 2 0 0 0 28 21L16 12"/></svg>';
+function readGate(){ const g = id => $("#"+id)?.value; auth.form = {username: g("g-user") ?? auth.form.username ?? "", name: g("g-name") ?? auth.form.name ?? ""}; }
+function renderGate(){
+  const g = $("#gate"); g.hidden = false;
+  const F = auth.form || {}, up = auth.tab==="signup";
+  g.innerHTML = `<div class="gate-card">
+    <div class="brand">${HANGER}<span>Cintre<i>.</i></span></div>
+    <div><div class="eyebrow">Ton espace personnel</div>
+      <h1 style="margin-top:12px">Ta garde-robe, <span class="s">à toi</span>.</h1>
+      <p class="gate-lead">${up ? "Un identifiant, un mot de passe : tes pièces, tes tenues et tes envies te suivent sur tous tes appareils." : "Connecte-toi pour retrouver tes pièces, tes tenues et tes envies sur tous tes appareils."}</p></div>
+    <div class="seg" role="group" aria-label="Mode"><button type="button" data-act="g-tab" data-v="login" aria-pressed="${!up}">Se connecter</button><button type="button" data-act="g-tab" data-v="signup" aria-pressed="${up}">Créer un compte</button></div>
+    <form data-form="gate" novalidate>
+      ${up ? `<div class="field"><label for="g-name">Prénom</label><input class="input" id="g-name" autocomplete="given-name" value="${esc(F.name||"")}" placeholder="Comment t'appeler ?"></div>` : ""}
+      <div class="field"><label for="g-user">Identifiant</label><input class="input" id="g-user" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" value="${esc(F.username||"")}" placeholder="ex. timothe"></div>
+      <div class="field"><label for="g-pass">Mot de passe</label><input class="input" id="g-pass" type="password" autocomplete="${up?"new-password":"current-password"}" placeholder="${up?"6 caractères minimum":"Ton mot de passe"}"></div>
+      <button class="btn primary" type="submit" id="g-submit" style="width:100%;padding:14px" ${auth.busy?"disabled":""}>${up?"Créer mon compte":"Se connecter"} <span aria-hidden="true">→</span></button>
+      <p class="gate-status ${auth.err?"err":""}" id="g-status" role="status">${esc(auth.status)}</p>
+    </form>
+    <button class="btn ghost" type="button" data-act="g-guest">Continuer sans compte</button>
+    <p class="gate-foot">Sans compte, tes pièces restent uniquement sur cet appareil.</p>
+  </div>`;
+}
+function gateMsg(text, err){ auth.status = text; auth.err = !!err; const p = $("#g-status"); if(p){ p.textContent = text; p.classList.toggle("err", !!err); } const b = $("#g-submit"); if(b) b.disabled = auth.busy; }
+function authErr(e){
+  const m = String(e?.message||"") + " " + String(e?.code||"");
+  if(/invalid login|invalid_credentials/i.test(m)) return "Identifiant ou mot de passe incorrect.";
+  if(/already registered|already exists|user_already_exists/i.test(m)) return "Cet identifiant est déjà pris. Choisis-en un autre, ou connecte-toi.";
+  if(/signups? not allowed|signup_disabled/i.test(m)) return "Les inscriptions sont fermées sur ce projet Supabase (Authentication → Sign In / Providers → « Allow new users to sign up »).";
+  if(/email_address_invalid|invalid.*email|email.*invalid/i.test(m)) return "Supabase refuse ce format d'identifiant. Voir le README (réglages e-mail du projet).";
+  if(/email not confirmed|email_not_confirmed/i.test(m)) return "Compte pas encore confirmé : désactive « Confirm email » dans Supabase, puis réessaie.";
+  if(/rate limit|over_request|over_email/i.test(m)) return "Trop de tentatives. Patiente une minute avant de réessayer.";
+  if(/weak|password should|password is/i.test(m)) return "Mot de passe trop faible : allonge-le ou ajoute des chiffres.";
+  if(isNetErr(e)) return "Pas de connexion à Internet. Réessaie, ou continue sans compte.";
+  return "Connexion impossible (" + m.trim().slice(0,80) + ").";
+}
+async function gateSubmit(){
+  if(auth.busy) return;
+  readGate(); const username = auth.form.username.trim(), name = (auth.form.name||"").trim(), pass = $("#g-pass")?.value || "";
+  const email = usernameToEmail(username), up = auth.tab==="signup";
+  if(!email) return gateMsg("Identifiant invalide : 3 à 40 caractères parmi lettres, chiffres, point, tiret et tiret bas.", true);
+  if(pass.length < 6) return gateMsg("Mot de passe trop court : 6 caractères minimum.", true);
+  auth.busy = true; gateMsg(up ? "Création du compte…" : "Connexion…");
+  try{
+    const sb = await supa().catch(() => { throw {message:"network"}; });
+    const res = up
+      ? await sb.auth.signUp({email, password:pass, options:{data:{username:username.toLowerCase(), display_name:name || username}}})
+      : await sb.auth.signInWithPassword({email, password:pass});
+    if(res.error) throw res.error;
+    auth.busy = false;
+    if(!res.data.session) return gateMsg("Compte créé, mais Supabase attend une confirmation par e-mail, impossible avec un identifiant. Désactive « Confirm email » dans Supabase (Authentication → Sign In / Providers → Email), puis connecte-toi.", true);
+    auth.status = ""; auth.form = {};
+    enterCloud(userFromSession(res.data.session.user), true);
+    toast(up ? `Bienvenue, ${auth.user.name} !` : `Content de te revoir, ${auth.user.name} !`);
+  }catch(e){ auth.busy = false; gateMsg(authErr(e), true); }
+}
+async function logout(force){
+  const pend = Object.keys(LS.get(outboxKey(), {}) || {}).length;
+  if(pend && !force){ modal.state.confirmLogout = pend; modal.paint(); return; }
+  try{ const sb = await supa(); await sb.auth.signOut({scope:"local"}); }catch{}
+  if(auth.user){ LS.del(`cintre.cloud.${auth.user.id}`); LS.del(outboxKey()); LS.del(`cintre.chat.${auth.user.id}`); }
+  LS.del("cintre.user");
+  for(const m of Object.values(DB)) m.clear();
+  auth.user = null; chat.list = null; store.mode = "loading"; store.loaded = false; auth.tab = "login"; auth.form = {};
+  showGate("Tu es déconnecté. À bientôt !");
+}
+/* Données saisies sans compte sur cet appareil, avant la connexion */
+function guestDocs(){ if(store.mode!=="cloud" || LS.get("cintre.v1.skip")) return []; const d = LS.get("cintre.v1", {}) || {}; return Object.values(d).filter(x => x && KIND_OF[x.kind] && x.id); }
+function transferBanner(){
+  const docs = guestDocs(); if(!docs.length) return "";
+  const n = docs.filter(d=>d.kind==="item").length;
+  return `<div class="banner"><span>Tu as ${n ? `${n} pièce${n>1?"s":""} et ` : ""}${docs.length - n} autre${docs.length-n>1?"s":""} élément${docs.length-n>1?"s":""} enregistrés sur cet appareil avant de te connecter.</span><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="transfer-skip">Ignorer</button><button class="btn sm primary" data-act="transfer">Les ajouter</button></div></div>`;
+}
+async function transferGuest(){
+  const docs = guestDocs(); if(!docs.length) return;
+  LS.set("cintre.v1.bak", LS.get("cintre.v1", {})); LS.del("cintre.v1");
+  ui.jour.picks = null; await saveMany(docs); toast(`${docs.length} éléments ajoutés à ton compte.`);
+}
+
+function accountBtn(){
+  if(!STANDALONE) return "";
+  const u = auth.user;
+  return `<button class="avatar ${u?"":"guest"}" data-act="account" aria-label="Mon compte">${u ? esc(initial(u.name)) : ICONS.user}</button>`;
+}
+function sideAccount(){
+  if(!STANDALONE) return "";
+  const u = auth.user;
+  return `<button class="side-account" data-act="account"><span class="avatar ${u?"":"guest"}">${u ? esc(initial(u.name)) : ICONS.user}</span><span class="body"><b>${u ? esc(u.name) : "Sans compte"}</b><span class="muted js-sync-short">${syncShort()}</span></span><span class="muted" aria-hidden="true">···</span></button>`;
+}
+function mAccount(s){
+  const n = items().length;
+  if(store.mode!=="cloud") return sheetHead("Mon compte") + `
+    <div class="row" style="flex-wrap:nowrap;gap:14px;margin-bottom:16px"><span class="avatar guest" style="width:56px;height:56px">${ICONS.user}</span><div><b style="font-size:18px">Sans compte</b><div class="muted" style="font-size:14px">${n} pièce${n>1?"s":""} sur cet appareil</div></div></div>
+    <p style="margin:0 0 16px">Crée un compte pour retrouver ta garde-robe sur ton téléphone et ton ordinateur, et ne plus risquer de la perdre en vidant ton navigateur. Tes pièces actuelles pourront y être ajoutées.</p>
+    <div class="row" style="justify-content:space-between"><button class="btn" data-act="settings">Réglages</button><div class="row"><button class="btn" data-act="g-open" data-v="login">Se connecter</button><button class="btn primary" data-act="g-open" data-v="signup">Créer un compte</button></div></div>`;
+  const u = auth.user;
+  return sheetHead("Mon compte") + `
+    <div class="row" style="flex-wrap:nowrap;gap:14px;margin-bottom:16px"><span class="avatar" style="width:56px;height:56px;font-size:22px">${esc(initial(u.name))}</span><div style="min-width:0"><b style="font-size:18px">${esc(u.name)}</b><div class="muted" style="font-size:14px">@${esc(u.username)} · ${n} pièce${n>1?"s":""} · ${outfitsWearable().length} tenue${outfitsWearable().length>1?"s":""}</div></div></div>
+    <div class="panel js-sync" style="background:var(--sunk);box-shadow:none;margin-bottom:16px;padding:14px 16px">${syncHTML()}</div>
+    ${transferBanner()}
+    ${s.confirmLogout ? `<div class="confirm" style="margin-bottom:14px"><b>${s.confirmLogout} modification${s.confirmLogout>1?"s":""} pas encore envoyée${s.confirmLogout>1?"s":""}</b><span class="muted" style="font-size:13px">Si tu te déconnectes maintenant, elle${s.confirmLogout>1?"s":""} sera${s.confirmLogout>1?"ont":""} perdue${s.confirmLogout>1?"s":""}. Reconnecte-toi au réseau et synchronise d'abord.</span><div class="row"><button class="btn sm" data-act="sync-now">Synchroniser</button><button class="btn sm danger" data-act="logout-yes">Me déconnecter quand même</button></div></div>` : ""}
+    <div class="row" style="justify-content:space-between"><button class="btn" data-act="settings">Réglages</button><div class="row"><button class="btn" data-act="sync-now">Synchroniser</button><button class="btn danger" data-act="logout">Se déconnecter</button></div></div>`;
+}
+
+/* ---------- Styliste (conversation avec Claude) ---------- */
+const chat = { list:null, busy:false, draft:"" };
+const chatKey = () => `cintre.chat.${auth.user?.id || "guest"}`;
+function chatList(){ if(!chat.list) chat.list = LS.get(chatKey(), []) || []; return chat.list; }
+const PROMPTS = [
+  ["Une tenue pour aujourd'hui", "Propose-moi une tenue pour aujourd'hui avec les pièces de mon dressing."],
+  ["Autour de ma wishlist", "Que puis-je porter avec les pièces de ma wishlist ? Laquelle vaut le plus le coup ?"],
+  ["Trouver des associations", "Quelles pièces de mon dressing vont bien ensemble et que je ne porte pas assez ?"],
+  ["Ce qu'il me manque", "Quelle pièce devrais-je acheter en priorité pour compléter ma garde-robe ?"]
+];
+function md(t){
+  let out = "", inList = false, para = [];
+  const flushP = () => { if(para.length){ out += `<p>${para.join("<br>")}</p>`; para = []; } };
+  for(const raw of esc(t).split("\n")){
+    const l = raw.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    if(/^\s*[-•*]\s+/.test(l)){ flushP(); if(!inList){ out += "<ul>"; inList = true; } out += `<li>${l.replace(/^\s*[-•*]\s+/, "")}</li>`; }
+    else { if(inList){ out += "</ul>"; inList = false; } if(l.trim()) para.push(l.replace(/^#+\s*/, "")); else flushP(); }
+  }
+  if(inList) out += "</ul>"; flushP(); return out;
+}
+function styleContext(){
+  const ws = wearStats();
+  const its = items().slice(0,150).map(i => `- ${i.name}${i.brand&&i.brand!=="Générique"?` (${i.brand})`:""} : ${CATS[i.category]?.one||i.category}, ${i.type} ; ${(i.colors||[]).map(c=>COLOR_LABEL[c]).join("/")||"couleur ?"} ; ${(i.seasons||[]).map(x=>SEASONS[x]).join("/")||"toutes saisons"}${(i.styles||[]).length?" ; "+i.styles.map(x=>STYLES[x]).join("/"):""} ; ${ws[i.id]?`porté ${ws[i.id].count} fois, dernière le ${ws[i.id].last}`:"jamais porté"}`).join("\n");
+  const wish = [...DB.wish.values()].map(w => `- ${w.name}${w.brand&&w.brand!=="Générique"?` (${w.brand})`:""}${w.price!=null&&w.price!==""?`, ${w.price} €`:""} : ${CATS[w.category]?.one||""}, ${(w.colors||[]).map(c=>COLOR_LABEL[c]).join("/")}${w.note?` — note : ${w.note}`:""}`).join("\n");
+  const outs = outfitsWearable().slice(0,30).map(o => `- ${o.name} : ${outfitItems(o).map(i=>i.name).join(" + ")}${o.fav?" (favorite)":""}`).join("\n");
+  const recent = [...DB.wear.values()].filter(w => daysBetween(w.date, today()) <= 7 && daysBetween(w.date, today()) >= 0).sort((a,b)=>b.date.localeCompare(a.date))
+    .map(w => `- ${w.date} : ${(w.itemIds||[]).map(id=>DB.items.get(id)?.name).filter(Boolean).join(", ")}`).join("\n");
+  const fresh = wx.data && wx.data.day===today();
+  const meteo = fresh ? `${wx.data.min} à ${wx.data.max} °C, ressenti ${wx.data.feel} °C, ${wxLabel(wx.data.code).toLowerCase()}${wx.data.rain?", pluie probable":""}${wx.loc?` (${wx.loc.name})`:""}` : `pas de prévision ; réglage choisi : ${WEATHER[ui.jour.weather].label.toLowerCase()}${ui.jour.rain?", pluie":""}`;
+  return `Date : ${fmtDate(today())}. Météo : ${meteo}.\n\nGarde-robe (${items().length} pièces) :\n${its||"(vide)"}\n\nWishlist :\n${wish||"(vide)"}\n\nTenues enregistrées :\n${outs||"(aucune)"}\n\nPorté ces 7 derniers jours :\n${recent||"(rien de noté)"}`;
+}
+async function askStylist(q){
+  q = String(q||"").trim(); if(!q || !store.ai || chat.busy) return;
+  const list = chatList(); list.push({role:"user", text:q});
+  const ans = {role:"ai", text:""}; list.push(ans);
+  chat.busy = true; chat.draft = ""; render(); scrollChat();
+  const hist = list.slice(-10, -2).map(m => `${m.role==="user"?"Utilisateur":"Styliste"} : ${m.text}`).join("\n\n");
+  const who = auth.user?.name ? auth.user.name : "l'utilisateur";
+  const prompt = `Tu es le styliste personnel de ${who} dans l'app de garde-robe Cintre. Tu tutoies, tu es chaleureux, direct et concret. Tu réponds en français, en 130 mots maximum sauf si on te demande plus de détails. Quand tu proposes une tenue, utilise uniquement des pièces de sa garde-robe ci-dessous, en citant leur nom exact en **gras**, et tiens compte de la météo et de ce qu'il a porté récemment. Ne suggère un achat que si on te le demande ou si c'est vraiment utile, et dis-le clairement. Pas de titre ; listes courtes avec « - » autorisées. Si la garde-robe est vide, explique comment ajouter des pièces dans l'app.\n\n${styleContext()}\n\n${hist?`Conversation précédente :\n${hist}\n\n`:""}Nouvelle question : ${q}`;
+  try{
+    await store.ai(prompt, {modelTier:"default", onText:({text}) => { ans.text = text; const b = $("#chat-last"); if(b) b.innerHTML = md(text); }});
+    if(!ans.text.trim()) ans.text = "Je n'ai pas réussi à formuler de réponse. Peux-tu reformuler ?";
+  }catch(e){ ans.text = aiError(e); ans.err = true; }
+  chat.busy = false; LS.set(chatKey(), list.slice(-40)); render(); scrollChat();
+}
+function scrollChat(){ requestAnimationFrame(() => window.scrollTo({top:document.documentElement.scrollHeight, behavior:"smooth"})); }
+
+/* ---------- Envies : photo recadrable, lien, tenues ---------- */
+const parsePrice = v => { const n = parseFloat(String(v??"").replace(/\s/g,"").replace(",", ".").replace(/[^\d.]/g, "")); return isFinite(n) ? Math.round(n*100)/100 : null; };
+const fmtPrice = n => (n==null || n==="" || !isFinite(+n)) ? "" : (+n).toLocaleString("fr-FR", {style:"currency", currency:"EUR", minimumFractionDigits:(+n)%1?2:0, maximumFractionDigits:2});
+const isWishOutfit = o => (o.itemIds||[]).some(id => DB.wish.has(id));
+const outfitsWearable = () => [...DB.outfits.values()].filter(o => !isWishOutfit(o));
+function cropGeom(c){
+  const m = Math.min(c.w, c.h), W = c.w/m*c.z*100, H = c.h/m*c.z*100;
+  const mx = (W-100)/200, my = (H-100)/200;
+  c.x = Math.max(-mx, Math.min(mx, c.x)); c.y = Math.max(-my, Math.min(my, c.y));
+  const L = (100-W)/2 + c.x*100, T = (100-H)/2 + c.y*100;
+  return {W, H, L, T, css:`width:${W}%;height:${H}%;left:${L}%;top:${T}%`};
+}
+function imgToCrop(im){ const cv = drawTo(im, 1200); return {src:toDataURL(cv), w:cv.width, h:cv.height, x:0, y:0, z:1}; }
+async function exportCrop(c){
+  if(c.remote) return c.src;
+  const im = await loadImage(c.src), g = cropGeom(c), N = 640;
+  const cv = document.createElement("canvas"); cv.width = cv.height = N;
+  const ctx = cv.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0,0,N,N);
+  ctx.drawImage(im, g.L/100*N, g.T/100*N, g.W/100*N, g.H/100*N);
+  return cv.toDataURL("image/jpeg", .82);
+}
+function newWish(){ return {kind:"wish", id:uid("wish"), name:"", brand:"", price:null, category:"haut", type:CATS.haut.types[0], colors:[], seasons:[], styles:[], url:"", note:"", createdAt:new Date().toISOString()}; }
+function readWishFields(s){
+  const g = id => $("#"+id)?.value;
+  const it = s.item; if(!$("#wi-name")) return;
+  Object.assign(it, {name:(g("wi-name")||"").trim(), brand:(g("wi-brand")||"").trim(), price:parsePrice(g("wi-price")), category:g("wi-cat")||it.category, type:g("wi-type")||it.type, url:(g("wi-url")||"").trim(), note:(g("wi-note")||"").trim()});
+}
+function mWish(s){
+  const it = s.item, c = s.crop, photo = s.noPhoto ? null : it.photo;
+  let frame;
+  if(c && c.src) frame = `<div class="crop" id="crop" ${c.remote?'data-fixed="1"':""}><img id="crop-img" src="${esc(c.src)}" alt="" style="${cropGeom(c).css}"></div>`;
+  else if(photo) frame = `<div class="crop" data-fixed="1"><img src="${esc(photo)}" alt="" style="width:100%;height:100%;left:0;top:0"></div>`;
+  else frame = `<div class="crop" data-fixed="1"><div class="ph">${ICONS.camera}<span>Ajoute une photo de la pièce, ou colle un lien et touche « Remplir ».</span></div></div>`;
+  const cats = Object.entries(CATS).map(([k,v]) => `<option value="${k}" ${it.category===k?"selected":""}>${v.one}</option>`).join("");
+  return sheetHead(s.isNew ? "Nouvelle envie" : "Modifier l'envie") + `
+    <div class="eyebrow" style="margin:-10px 0 16px">Une idée pour plus tard</div>
+    ${frame}
+    ${c && c.src && !c.remote ? `<p class="muted" style="text-align:center;font-size:12px;margin:8px 0 4px">Fais glisser la photo pour choisir le cadrage.</p>
+      <div style="max-width:280px;margin:0 auto"><label for="wi-zoom" class="row" style="justify-content:space-between;font-size:13px;font-weight:600">Zoom <output id="wi-zoom-v" class="mono">${Math.round(c.z*100)} %</output></label><input type="range" id="wi-zoom" min="100" max="300" step="5" value="${Math.round(c.z*100)}"></div>` : ""}
+    <div class="row" style="justify-content:center;margin:12px 0 18px"><label class="btn sm primary">Appareil photo<input class="vh" type="file" id="file-wish-cam" accept="image/*" capture="environment"></label><label class="btn sm">Galerie<input class="vh" type="file" id="file-wish" accept="image/*"></label>${(c&&c.src)||photo?`<button class="btn sm ghost danger" data-act="wi-nophoto">Retirer</button>`:""}</div>
+    ${s.busy ? `<p class="row muted" style="margin:0 0 14px"><span class="spinner"></span> Claude analyse la photo…</p>` : s.aiNote ? `<p class="muted" style="font-size:13px;margin:0 0 14px">${esc(s.aiNote)}</p>` : ""}
+    <div class="field"><label for="wi-url">Lien (facultatif)</label><div class="row" style="flex-wrap:nowrap"><input class="input" id="wi-url" type="url" inputmode="url" autocapitalize="none" value="${esc(it.url||"")}" placeholder="https://…" style="flex:1;min-width:0"><button class="btn" type="button" data-act="wi-link" ${s.linkBusy?"disabled":""}>${s.linkBusy?'<span class="spinner"></span>':ICONS.spark}<span>Remplir</span></button></div>
+      <span class="muted" style="font-size:12px">${esc(s.linkMsg || "« Remplir » lit le nom, la marque, le prix et la photo de la page (via le service Microlink).")}</span></div>
+    <div class="field"><label for="wi-name">Nom de la pièce</label><input class="input" id="wi-name" value="${esc(it.name)}" placeholder="Ex. Veste en jean"></div>
+    <div class="two"><div class="field"><label for="wi-brand">Marque</label><input class="input" id="wi-brand" value="${esc(it.brand&&it.brand!=="Générique"?it.brand:"")}" placeholder="Ex. Sézane"></div>
+      <div class="field"><label for="wi-price">Prix (€)</label><input class="input" id="wi-price" inputmode="decimal" value="${it.price!=null&&it.price!==""?String(it.price).replace(".", ","):""}" placeholder="89,90"></div></div>
+    <div class="two"><div class="field"><label for="wi-cat">Catégorie</label><select class="input" id="wi-cat">${cats}</select></div>
+      <div class="field"><label for="wi-type">Type</label><select class="input" id="wi-type">${CATS[it.category].types.map(t=>`<option ${it.type===t?"selected":""}>${t}</option>`).join("")}</select></div></div>
+    <div class="field"><span class="lab">Couleurs (servent à calculer avec quoi elle irait)</span>${chipsField("colors", COLOR_LABEL, it.colors)}</div>
+    <div class="field"><label for="wi-note">Note (facultatif)</label><textarea class="input" id="wi-note" style="min-height:76px" placeholder="Taille, boutique, alternative moins chère…">${esc(it.note||"")}</textarea></div>
+    ${s.err ? `<p style="color:var(--bad);margin:0 0 10px">${esc(s.err)}</p>` : ""}
+    <div class="row" style="justify-content:space-between">${s.isNew ? "<span></span>" : `<button class="btn ghost danger" data-act="wi-del" data-id="${it.id}">Supprimer</button>`}<div class="row"><button class="btn" data-act="close">Annuler</button><button class="btn primary" data-act="wi-save" ${s.saving?"disabled":""}>Enregistrer</button></div></div>`;
+}
+async function onWishPhoto(file, s){
+  readWishFields(s);
+  const im = await fileToImage(file).catch(() => null); if(!im){ toast("Image illisible."); return; }
+  s.crop = imgToCrop(im); s.noPhoto = false; s.err = ""; if(modal.state===s) modal.paint();
+  if(store.ai && store.aiImages) tagWish(s, im);
+}
+async function tagWish(s, im){
+  s.busy = true; s.aiNote = ""; modal.paint();
+  try{
+    const blob = await toBlob(drawTo(im, 1024));
+    const t = cleanTags(await store.ai.json(`Tu caractérises un vêtement pour une app de garde-robe. Regarde la photo et réponds uniquement avec un objet JSON de la forme ${TAG_SCHEMA}.`, {images:[blob], modelTier:"default"}) || {});
+    if(modal.state!==s) return;
+    readWishFields(s); const it = s.item;
+    if(!it.name) it.name = t.name; if(!it.brand && t.brand) it.brand = t.brand;
+    it.category = t.category; it.type = t.type; if(!(it.colors||[]).length) it.colors = t.colors;
+    it.seasons = t.seasons; it.styles = t.styles; it.material = t.material; it.warmth = t.warmth;
+    s.aiNote = "Catégorie, type et couleurs détectés par Claude. Vérifie avant d'enregistrer.";
+  }catch(e){ if(modal.state!==s) return; readWishFields(s); s.aiNote = aiError(e); }
+  s.busy = false; modal.paint();
+}
+function findProduct(node, depth=0){
+  if(!node || typeof node!=="object" || depth>5) return null;
+  if(Array.isArray(node)){ for(const n of node){ const p = findProduct(n, depth+1); if(p) return p; } return null; }
+  const t = [].concat(node["@type"]||[]).join(" ");
+  if(/Product/i.test(t)) return node;
+  return findProduct(node["@graph"], depth+1) || (node.mainEntity ? findProduct(node.mainEntity, depth+1) : null);
+}
+async function wishFromLink(s){
+  readWishFields(s); const raw = (s.item.url||"").trim();
+  let u; try{ u = new URL(/^https?:\/\//i.test(raw) ? raw : "https://" + raw); if(!/\./.test(u.hostname)) throw 0; }catch{ s.linkMsg = "Colle d'abord l'adresse complète de la page produit."; modal.paint(); return; }
+  s.item.url = u.href; s.linkBusy = true; s.linkMsg = "Lecture de la page…"; modal.paint();
+  try{
+    const api = new URL("https://api.microlink.io/");
+    api.searchParams.set("url", u.href);
+    api.searchParams.set("data.ld.selector", 'script[type="application/ld+json"]'); api.searchParams.set("data.ld.attr", "text"); api.searchParams.set("data.ld.type", "string");
+    api.searchParams.set("data.price.selector", 'meta[property="product:price:amount"],meta[property="og:price:amount"],[itemprop="price"]'); api.searchParams.set("data.price.attr", "content");
+    const r = await fetch(api, {headers:{Accept:"application/json"}}); const j = await r.json();
+    if(j.status !== "success") throw new Error(j.message || "microlink");
+    const d = j.data || {};
+    let prod = null; try{ prod = findProduct(JSON.parse(d.ld || "null")); }catch{}
+    if(modal.state!==s) return;
+    readWishFields(s); const it = s.item, got = [];
+    const brand = prod && (typeof prod.brand==="string" ? prod.brand : prod.brand?.name);
+    const offer = prod && [].concat(prod.offers||[])[0];
+    const price = parsePrice(offer?.price ?? offer?.lowPrice ?? d.price);
+    let title = String(prod?.name || d.title || "").split(/\s[|–—-]\s/)[0].trim();
+    if(!it.name && title){ it.name = title.slice(0,80); got.push("nom"); }
+    if(!it.brand && brand){ it.brand = String(brand).slice(0,40); got.push("marque"); }
+    if((it.price==null || it.price==="") && price!=null){ it.price = price; got.push("prix"); }
+    it.shop = String(d.publisher || u.hostname.replace(/^www\./, "")).slice(0,40);
+    const img = [].concat(prod?.image || [])[0]; const imgUrl = (typeof img==="string" ? img : img?.url) || d.image?.url;
+    if(imgUrl && !(s.crop && s.crop.src) && !(it.photo && !s.noPhoto)){
+      try{ const res = await fetch(imgUrl, {mode:"cors"}); if(!res.ok) throw 0; const b = await res.blob(); if(!/^image\//.test(b.type)) throw 0; s.crop = imgToCrop(await fileToImage(b)); got.push("photo"); }
+      catch{ try{ const im = await loadImage(imgUrl); s.crop = {src:imgUrl, w:im.naturalWidth, h:im.naturalHeight, x:0, y:0, z:1, remote:true}; got.push("photo (non recadrable)"); }catch{} }
+      s.noPhoto = false;
+    }
+    s.linkMsg = got.length ? `Rempli : ${got.join(", ")}. Vérifie avant d'enregistrer.` : "Rien de lisible sur cette page. Remplis les champs à la main.";
+  }catch{ if(modal.state!==s) return; readWishFields(s); s.linkMsg = "Impossible de lire cette page (site protégé ou limite du service atteinte). Remplis les champs à la main."; }
+  s.linkBusy = false; modal.paint();
+}
+let drag = null;
+document.addEventListener("pointerdown", e => {
+  const f = e.target.closest("#crop"); const c = modal.state && modal.state.crop;
+  if(!f || f.dataset.fixed || !c) return;
+  drag = {x:e.clientX, y:e.clientY, sx:c.x, sy:c.y, size:f.clientWidth, el:f}; f.classList.add("dragging");
+  try{ f.setPointerCapture(e.pointerId); }catch{}
+  e.preventDefault();
+});
+document.addEventListener("pointermove", e => {
+  if(!drag) return; const c = modal.state.crop; if(!c){ drag = null; return; }
+  c.x = drag.sx + (e.clientX - drag.x)/drag.size; c.y = drag.sy + (e.clientY - drag.y)/drag.size;
+  const img = $("#crop-img"); if(img) img.style.cssText = cropGeom(c).css;
+});
+const endDrag = () => { if(drag){ drag.el.classList.remove("dragging"); drag = null; } };
+document.addEventListener("pointerup", endDrag); document.addEventListener("pointercancel", endDrag);
+function wishCard(w){
+  const v = addedValue(w);
+  const q = encodeURIComponent((w.brand && w.brand!=="Générique" ? w.brand + " " : "") + w.name);
+  return `<div class="piece wish-card">
+    <button class="wbtn" data-act="wish-edit" data-id="${w.id}" aria-label="Modifier ${esc(w.name)}">${thumb(w)}</button>
+    <span class="name">${esc(w.name)}</span>
+    <span class="meta"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(w.brand && w.brand!=="Générique" ? w.brand : (w.shop || CATS[w.category]?.one || ""))}</span>${fmtPrice(w.price) ? `<span class="wprice">${fmtPrice(w.price)}</span>` : ""}</span>
+    <span class="wfit">${v.n ? `Irait avec <b>${v.n} ${v.unit}</b>` : `<span style="color:var(--warn)">S'accorde avec peu de choses</span>`}</span>
+    ${w.note ? `<span class="wnote">${esc(w.note)}</span>` : ""}
+    <div class="row wact">${w.url ? `<a class="btn sm" href="${esc(w.url)}" target="_blank" rel="noopener">Voir</a>` : `<a class="btn sm" href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">Trouver</a>`}<button class="btn sm" data-act="wish-bought" data-id="${w.id}">Acheté</button></div>
+  </div>`;
+}
+async function replaceInOutfits(fromId, toId){
+  for(const o of [...DB.outfits.values()]) if((o.itemIds||[]).includes(fromId)){
+    const ids = toId ? o.itemIds.map(x => x===fromId ? toId : x) : o.itemIds.filter(x => x!==fromId);
+    await put({...o, itemIds:ids});
+  }
+}
+
+/* ---------- Accueil ---------- */
+function greet(){ const h = new Date().getHours(); return h>=5 && h<18 ? "Bonjour" : "Bonsoir"; }
+function viewAccueil(){
+  if(!store.loaded) return `${brandMobile()}<div class="empty"><span class="spinner"></span><p>Ouverture de ta penderie…</p></div>`;
+  const name = auth.user?.name;
+  const fresh = wx.data && wx.data.day===today() && wx.loc;
+  const head = `${brandMobile()}<div class="head"><div><div class="eyebrow">${esc(fmtDate(today()))}${fresh ? ` · ${wx.data.now}°, ${esc(wxLabel(wx.data.code).toLowerCase())}` : ""}</div>
+      <h1 style="margin-top:10px">${greet()}${name ? `, <span class="s">${esc(name)}</span>` : ` <span class="s">!</span>`}</h1><p>Bienvenue dans ton dressing.</p></div>
+    <button class="btn primary" data-act="new-outfit">${ICONS.plus}Créer une tenue</button></div>${transferBanner()}${STANDALONE && store.mode==="local" ? modeBanner() : ""}`;
+  const hero = `<div class="hero">${HANGER.replace("<svg ", '<svg class="hero-deco" aria-hidden="true" ')}
+      <div class="eyebrow">Ton inspiration du jour</div>
+      <h2>Moins d'hésitation.<br><span class="s">Plus de style.</span></h2>
+      <p>Compose tes looks préférés et retrouve-les en un clin d'œil.</p>
+      <button class="btn" data-act="new-outfit">Composer une tenue <span aria-hidden="true">↗</span></button></div>`;
+  const all = items();
+  if(!all.length) return head + `<div class="home-grid">${hero}<div class="panel empty">
+      <h2>Ta penderie est vide</h2><p>Ajoute tes premières pièces en photo, scanne ta penderie d'un coup, ou explore l'app avec une garde-robe d'exemple.</p>
+      <div class="row" style="justify-content:center"><button class="btn primary" data-act="add">${ICONS.plus}Ajouter mes vêtements</button><button class="btn" data-act="demo">Charger l'exemple</button></div></div></div>`;
+  const J = ui.jour;
+  if(!J.picks && baseCombos().length) J.picks = suggest(J);
+  const p = J.picks?.[J.idx];
+  const todayCard = `<div class="panel stack">
+      <div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:flex-start"><div><div class="eyebrow">Tenue du jour</div><h2 style="font-size:22px;margin-top:6px">${OCCASIONS[J.occ].label} · ${WEATHER[J.weather].label.toLowerCase()}${J.rain?", pluie":""}</h2></div><button class="btn sm" data-act="tab" data-v="jour">Ajuster</button></div>
+      ${p ? `<div class="hero-outfit today-mini">${p.pieces.map(i=>`<button class="piece" data-act="item" data-id="${i.id}">${thumb(i)}<span class="name">${esc(i.name)}</span></button>`).join("")}</div>
+        <div class="row"><button class="btn primary" data-act="j-wear">Je la porte</button><button class="btn" data-act="j-next">Autre idée</button><button class="btn ghost" data-act="j-save">Sauvegarder</button></div>`
+      : `<p class="muted" style="margin:0">${baseCombos().length ? "Aucune combinaison ne passe les filtres de météo. Touche « Ajuster » pour changer la météo ou l'occasion." : "Il faut au moins un haut, un bas et des chaussures (ou une robe et des chaussures) pour te proposer une tenue."}</p>`}
+    </div>`;
+  const ws = wearStats(); const month = today().slice(0,7);
+  const daysThisMonth = new Set([...DB.wear.values()].filter(w=>w.date.startsWith(month)).map(w=>w.date)).size;
+  const stat = `<div class="stat" style="margin:16px 0 0"><div><b>${all.length}</b><span>pièce${all.length>1?"s":""}</span></div><div><b>${outfitsWearable().length}</b><span>tenue${outfitsWearable().length>1?"s":""}</span></div><div><b>${daysThisMonth}</b><span>jour${daysThisMonth>1?"s":""} notés ce mois</span></div></div>`;
+  const outs = outfitsWearable().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0) || (b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,8);
+  const outsBlock = `<div class="section-title"><h2>Tes tenues</h2><button class="linkmore" data-act="tab" data-v="tenues">Tout voir →</button></div>`
+    + (outs.length ? `<div class="hscroll wide">${outs.map(outfitCard).join("")}</div>` : `<div class="panel empty" style="padding:24px"><p>Aucune tenue enregistrée. Assemble tes pièces préférées pour les retrouver en un clin d'œil.</p><button class="btn primary" data-act="new-outfit">Créer une tenue</button></div>`);
+  const itemsBlock = `<div class="section-title"><h2>Dans ta penderie</h2><button class="linkmore" data-act="tab" data-v="dressing">Explorer →</button></div><div class="hscroll">${all.slice(0,12).map(i=>pieceCard(i, ws)).join("")}</div>`;
+  const sleeping = items().filter(i => { const w = ws[i.id]; const age = daysBetween(i.createdAt?.slice(0,10)||today(), today()); return (!w && age>=30) || (w && daysBetween(w.last, today())>=90); }).length;
+  const shortcuts = `<div class="section-title"><h2>Raccourcis</h2></div><div class="shortcuts">
+      <button class="shortcut" data-act="tab" data-v="styliste"><span class="ic">${ICONS.styliste}</span><span class="body"><b>Demander à ton styliste</b><span>Une tenue, une association, un conseil d'achat.</span></span></button>
+      <button class="shortcut" data-act="tab" data-v="envies"><span class="ic">${ICONS.envies}</span><span class="body"><b>${DB.wish.size} envie${DB.wish.size>1?"s":""}</b><span>Vois avec combien de tenues chacune irait.</span></span></button>
+      <button class="shortcut" data-act="tab" data-v="revente"><span class="ic">${ICONS.revente}</span><span class="body"><b>${sleeping} pièce${sleeping>1?"s":""} à revoir</b><span>Celles qui dorment dans ton placard.</span></span></button>
+      <button class="shortcut" data-act="tab" data-v="tenues" data-cal="1"><span class="ic">${ICONS.jour}</span><span class="body"><b>Calendrier</b><span>Ce que tu as porté, jour par jour.</span></span></button>
+    </div>`;
+  return head + `<div class="home-grid">${todayCard}${hero}</div>` + stat + outsBlock + itemsBlock + shortcuts;
+}
+
+/* ---------- Styliste : vue ---------- */
+function viewStyliste(){
+  const list = chatList();
+  const head = `${brandMobile()}<div class="head"><div><div class="eyebrow">Ton conseiller de style</div><h1 style="margin-top:10px">Ton <span class="s">styliste</span></h1><p>Des idées pensées à partir de ton dressing, de la météo et de tes envies.</p></div>${list.length?`<button class="btn sm ghost" data-act="chat-clear" ${chat.busy?"disabled":""}>Nouvelle conversation</button>`:""}</div>`;
+  if(!store.ai) return head + `<div class="panel empty"><h2>Active Claude</h2><p>${STANDALONE ? "Le styliste s'appuie sur Claude. Ajoute ta clé API dans les réglages pour lui parler." : "Le styliste a besoin de l'accès à Claude."}</p>${STANDALONE?`<button class="btn primary" data-act="settings">Ouvrir les réglages</button>`:""}</div>`;
+  const intro = `<div class="panel stack">
+      <div class="row" style="flex-wrap:nowrap;gap:12px;align-items:flex-start"><span class="avatar" style="background:var(--accent);color:var(--accent-ink)">${ICONS.spark}</span><div><b>Salut${auth.user ? `, ${esc(auth.user.name)}` : ""} !</b><div class="muted" style="font-size:14px">Je connais tes ${items().length} pièces, tes tenues, tes envies et la météo du jour. Demande-moi une tenue, une association ou un conseil d'achat.</div></div></div>
+      <div class="prompts">${PROMPTS.map(([l],k)=>`<button class="prompt" data-act="chat-p" data-v="${k}" ${chat.busy?"disabled":""}><span>${l}</span><span aria-hidden="true">↗</span></button>`).join("")}</div></div>`;
+  const msgs = list.map((m,k) => m.role==="user" ? `<div class="msg me">${esc(m.text)}</div>`
+    : `<div class="msg ai ${m.err?"err":""}" ${k===list.length-1?'id="chat-last"':""}>${m.text ? md(m.text) : '<span class="spinner"></span>'}</div>`).join("");
+  return head + (list.length ? `<div class="chat">${msgs}</div>` : intro)
+    + `<form class="composer" data-form="chat"><textarea id="chat-q" rows="1" placeholder="Pose ta question à ton styliste…" aria-label="Ta question" enterkeyhint="send">${esc(chat.draft)}</textarea><button class="btn primary" type="submit" aria-label="Envoyer" ${chat.busy?"disabled":""}>${ICONS.send}</button></form>`;
+}
+
 /* ---------- Navigation ---------- */
-const TABS = [["dressing","Dressing"],["tenues","Tenues"],["jour","Aujourd'hui"],["envies","Envies"],["revente","Revente"]];
-const ui = { tab:"dressing", cat:"tous", color:"", season:"", sort:"recent", q:"", tenuesView:"liste", occFilter:"", calMonth:null,
+const TABS = [["accueil","Accueil"],["dressing","Dressing"],["tenues","Tenues"],["envies","Envies"],["styliste","Styliste"]];
+const SIDE_TABS = [["accueil","Accueil"],["jour","Aujourd'hui"],["dressing","Dressing"],["tenues","Tenues"],["envies","Envies"],["styliste","Styliste"],["revente","Revente"]];
+const PARENT = {jour:"accueil", revente:"accueil"};
+const ui = { tab:"accueil", wishCat:"", cat:"tous", color:"", season:"", sort:"recent", q:"", tenuesView:"liste", occFilter:"", calMonth:null,
   jour:{weather:"frais", occ:"cours", rain:false, picks:null, idx:0, ai:"", aiBusy:false},
   shop:{q:"", done:"", busy:false, results:null, err:""} };
 function setTab(t){ ui.tab = t; if(location.hash !== "#"+t) history.replaceState(null,"","#"+t); render(); window.scrollTo(0,0); }
-function navHTML(){
-  return TABS.map(([k,l])=>`<button class="tab" data-act="tab" data-v="${k}" ${ui.tab===k?'aria-current="page"':""}>${ICONS[k]}<span>${l}</span></button>`).join("");
+function navHTML(list, mobile){
+  const cur = mobile ? (PARENT[ui.tab] || ui.tab) : ui.tab;
+  return list.map(([k,l])=>`<button class="tab" data-act="tab" data-v="${k}" ${cur===k?'aria-current="page"':""}>${ICONS[k]}<span>${l}</span></button>`).join("");
 }
+const backLink = () => `<button class="linkmore back" data-act="tab" data-v="accueil">‹ Accueil</button>`;
 
 /* ---------- Vues ---------- */
-function brandMobile(){ return `<div class="mobile-brand brand" style="font-size:20px">${ICONS.dressing.replace('viewBox','style="width:24px;height:24px;color:var(--ink)" viewBox')}<span>Cintre<i>.</i></span></div>`; }
+function brandMobile(){ return `<div class="mobile-brand"><div class="brand" style="font-size:20px;margin:0">${ICONS.dressing.replace('viewBox','style="width:24px;height:24px;color:var(--ink)" viewBox')}<span>Cintre<i>.</i></span></div>${accountBtn()}</div>`; }
 function modeBanner(){
-  if(STANDALONE) return `<div class="banner"><span>${store.ai?"Claude est activé. Tes pièces restent sur cet appareil : exporte une sauvegarde de temps en temps.":"Ajoute ta clé Claude pour activer les tags automatiques, le scan en lot et la recherche en boutique."}</span><button class="btn sm" data-act="settings">Réglages</button></div>`;
+  if(STANDALONE){
+    if(store.mode==="local") return `<div class="banner"><span>Sans compte, tes pièces restent sur cet appareil. Crée un compte pour les retrouver partout et ne pas les perdre.</span><button class="btn sm" data-act="g-open" data-v="signup">Créer un compte</button></div>`;
+    if(!store.ai) return `<div class="banner"><span>Ajoute ta clé Claude pour activer les tags automatiques, le scan en lot, le styliste et la recherche en boutique.</span><button class="btn sm" data-act="settings">Réglages</button></div>`;
+    return "";
+  }
   if(store.mode==="local") return `<div class="banner"><span>Mode hors connexion : tes pièces restent dans ce navigateur uniquement. Ouvre l'app depuis ton compte Claude pour les retrouver partout.</span></div>`;
   return "";
 }
@@ -782,7 +1396,7 @@ function viewDressing(){
   let list = all.filter(i => (ui.cat==="tous"||i.category===ui.cat) && (!ui.color||(i.colors||[]).includes(ui.color)) && (!ui.season||(i.seasons||[]).includes(ui.season)) && (!ui.q || (i.name+" "+(i.brand||"")+" "+i.type).toLowerCase().includes(ui.q.toLowerCase())));
   if(ui.sort==="most") list.sort((a,b)=>(ws[b.id]?.count||0)-(ws[a.id]?.count||0));
   if(ui.sort==="least") list.sort((a,b)=>(ws[a.id]?.count||0)-(ws[b.id]?.count||0));
-  const head = `${brandMobile()}<div class="head"><div><h1>Ma <span class="s">garde-robe</span></h1><p>${all.length} pièce${all.length>1?"s":""} · ${DB.outfits.size} tenue${DB.outfits.size>1?"s":""} enregistrée${DB.outfits.size>1?"s":""}</p></div>
+  const head = `${brandMobile()}<div class="head"><div><h1>Ma <span class="s">garde-robe</span></h1><p>${all.length} pièce${all.length>1?"s":""} · ${outfitsWearable().length} tenue${outfitsWearable().length>1?"s":""} enregistrée${outfitsWearable().length>1?"s":""}</p></div>
     <div class="row">${hasDemo()?`<button class="btn sm ghost" data-act="clear-demo">Retirer les exemples</button>`:""}<button class="btn primary" data-act="add">${ICONS.plus}Ajouter</button></div></div>${modeBanner()}`;
   if(!all.length) return head + `<div class="panel empty">
       <svg class="big" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 9a3 3 0 1 1 3-3"/><path d="M16 9v3L4 21a2 2 0 0 0 1.2 3.6h21.6A2 2 0 0 0 28 21L16 12"/></svg>
@@ -822,18 +1436,18 @@ function outfitCard(o){
       <h3 style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(o.name)}</h3>
       <button class="btn ghost sm fav" data-act="fav" data-id="${o.id}" aria-label="${o.fav?"Retirer des favoris":"Ajouter aux favoris"}">${o.fav?ICONS.star:ICONS.starO}</button>
     </div>
-    <div class="tags">${o.occasion?`<span class="tagl">${OCCASIONS[o.occasion]?.label||""}</span>`:""}${(o.seasons||[]).map(s=>`<span class="tagl">${SEASONS[s]}</span>`).join("")}${o.demo?`<span class="tagl">Exemple</span>`:""}</div>
-    <button class="btn sm" data-act="wear-outfit" data-id="${o.id}">Je la porte aujourd'hui</button>
+    <div class="tags">${isWishOutfit(o)?`<span class="tagl" style="background:var(--accent-soft);color:var(--accent)">Avec ${(o.itemIds||[]).filter(id=>DB.wish.has(id)).length} envie(s)</span>`:""}${o.occasion?`<span class="tagl">${OCCASIONS[o.occasion]?.label||""}</span>`:""}${(o.seasons||[]).map(s=>`<span class="tagl">${SEASONS[s]}</span>`).join("")}${o.demo?`<span class="tagl">Exemple</span>`:""}</div>
+    ${isWishOutfit(o)?`<button class="btn sm" data-act="outfit" data-id="${o.id}">Modifier</button>`:`<button class="btn sm" data-act="wear-outfit" data-id="${o.id}">Je la porte aujourd'hui</button>`}
   </div>`;
 }
 function viewTenues(){
   const seg = `<div class="seg" role="group" aria-label="Affichage"><button data-act="tv" data-v="liste" aria-pressed="${ui.tenuesView==="liste"}">Mes tenues</button><button data-act="tv" data-v="cal" aria-pressed="${ui.tenuesView==="cal"}">Calendrier</button></div>`;
   const head = `${brandMobile()}<div class="head"><div><h1>Mes <span class="s">tenues</span></h1><p>Tes associations prêtes à porter, et ce que tu as porté.</p></div><div class="row">${seg}<button class="btn primary" data-act="new-outfit">${ICONS.plus}Créer</button></div></div>`;
   if(ui.tenuesView==="cal") return head + viewCalendar();
-  let outs = [...DB.outfits.values()].sort((a,b)=>(b.fav?1:0)-(a.fav?1:0) || (b.createdAt||"").localeCompare(a.createdAt||""));
+  let outs = outfitsWearable().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0) || (b.createdAt||"").localeCompare(a.createdAt||""));
   if(ui.occFilter==="fav") outs = outs.filter(o=>o.fav); else if(ui.occFilter) outs = outs.filter(o=>o.occasion===ui.occFilter);
   const chips = `<div class="filters"><button class="chip" data-act="f-occ" data-v="" aria-pressed="${!ui.occFilter}">Toutes</button><button class="chip" data-act="f-occ" data-v="fav" aria-pressed="${ui.occFilter==="fav"}">${ICONS.star} Favorites</button>${Object.entries(OCCASIONS).map(([k,v])=>`<button class="chip" data-act="f-occ" data-v="${k}" aria-pressed="${ui.occFilter===k}">${v.label}</button>`).join("")}</div>`;
-  if(!DB.outfits.size) return head + `<div class="panel empty"><h2>Aucune tenue pour l'instant</h2><p>Assemble un haut, un bas et des chaussures, ou laisse l'onglet « Aujourd'hui » t'en proposer une à partir de ta garde-robe.</p><div class="row"><button class="btn primary" data-act="new-outfit">Créer une tenue</button><button class="btn" data-act="tab" data-v="jour">Voir une suggestion</button></div></div>`;
+  if(!outfitsWearable().length) return head + `<div class="panel empty"><h2>Aucune tenue pour l'instant</h2><p>Assemble un haut, un bas et des chaussures, ou laisse la tenue du jour t'en proposer une à partir de ta garde-robe.</p><div class="row"><button class="btn primary" data-act="new-outfit">Créer une tenue</button><button class="btn" data-act="tab" data-v="jour">Voir une suggestion</button></div></div>`;
   return head + chips + (outs.length ? `<div class="outfits">${outs.map(outfitCard).join("")}</div>` : `<div class="panel empty"><p>Aucune tenue dans cette catégorie.</p></div>`);
 }
 function viewCalendar(){
@@ -866,7 +1480,7 @@ function viewCalendar(){
 
 function viewJour(){
   const J = ui.jour;
-  const head = `${brandMobile()}<div class="head"><div><h1>Tenue du <span class="s">jour</span></h1><p><span style="text-transform:capitalize">${fmtDate(today())}</span>${wx.data&&wx.data.day===today()&&wx.loc?` · ${wx.data.now}°, ${esc(wxLabel(wx.data.code).toLowerCase())} · ${esc(wx.loc.name)}`:""}</p></div></div>`;
+  const head = `${brandMobile()}${backLink()}<div class="head"><div><h1>Tenue du <span class="s">jour</span></h1><p><span style="text-transform:capitalize">${fmtDate(today())}</span>${wx.data&&wx.data.day===today()&&wx.loc?` · ${wx.data.now}°, ${esc(wxLabel(wx.data.code).toLowerCase())} · ${esc(wx.loc.name)}`:""}</p></div></div>`;
   const can = baseCombos().length;
   const controls = `<div class="panel stack">
       <div><div class="mono muted" style="margin-bottom:8px">Météo</div>${wxBlock()}<div class="weather">${Object.entries(WEATHER).map(([k,v])=>`<button class="chip" data-act="j-w" data-v="${k}" aria-pressed="${J.weather===k}">${v.label}<b>${v.range}</b></button>`).join("")}</div>
@@ -899,12 +1513,21 @@ function missingBlock(){
 
 function viewEnvies(){
   const wish = [...DB.wish.values()].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
-  const head = `${brandMobile()}<div class="head"><div><h1>Mes <span class="s">envies</span></h1><p>Cherche en boutique, puis vois avec combien de tes tenues la pièce irait.</p></div><button class="btn" data-act="library" data-v="wish">${ICONS.search}Bibliothèque</button></div>`;
-  const body = (wish.length ? `<div class="section-title"><h2>Ma wishlist</h2></div><div class="panel"><div class="list">${wish.map(w=>{ const v = addedValue(w); return `<div class="li">${thumb(w)}<div class="body"><b>${esc(w.name)}</b><span class="muted" style="font-size:13px">${w.brand&&w.brand!=="Générique"?esc(w.brand)+" · ":""}${esc(w.type)}${w.shop?" · "+esc(w.shop):""}${w.price!=null?` · ${w.price} €`:""}</span>
-      <div style="font-size:13px;margin-top:2px">${v.n?`Irait avec <b style="display:inline;color:var(--accent)">${v.n} ${v.unit}</b>`:`<span style="color:var(--warn)">Ne s'accorde avec presque rien chez toi</span>`}</div>
-      <div class="row" style="margin-top:6px">${w.url?`<a class="btn sm" href="${esc(w.url)}" target="_blank" rel="noopener">Voir l'article</a>`:`<a class="btn sm" href="https://www.google.com/search?tbm=shop&q=${encodeURIComponent((w.brand&&w.brand!=="Générique"?w.brand+" ":"")+w.name)}" target="_blank" rel="noopener">Trouver en boutique</a>`}<a class="btn sm" href="https://www.vinted.fr/catalog?search_text=${encodeURIComponent((w.brand&&w.brand!=="Générique"?w.brand+" ":"")+w.name)}" target="_blank" rel="noopener">En seconde main</a><button class="btn sm" data-act="wish-bought" data-id="${w.id}">Je l'ai acheté</button><button class="btn sm ghost danger" data-act="wish-del" data-id="${w.id}">Retirer</button></div></div></div>`;}).join("")}</div></div>`
-    : `<div class="section-title"><h2>Ma wishlist</h2></div><div class="panel empty"><p>Rien dans tes envies pour l'instant. Cherche une pièce ci-dessus ou dans la bibliothèque : l'app te dit avec combien de tes tenues elle irait avant que tu l'achètes.</p></div>`);
-  return head + shopPanel() + body + `<p class="muted" style="font-size:12px;margin-top:12px">Pas encore de liens d'affiliation (Awin, Rakuten…) : ils viendront avec les flux produits.</p>`;
+  const head = `${brandMobile()}<div class="head"><div><div class="eyebrow">Les pièces qui te font envie</div><h1 style="margin-top:10px">Mes <span class="s">envies</span></h1><p>Garde tes trouvailles et vois avec combien de tes tenues elles iraient, avant d'acheter.</p></div>
+    <div class="row"><button class="btn" data-act="library" data-v="wish">${ICONS.search}Bibliothèque</button><button class="btn primary" data-act="wish-new">${ICONS.plus}Ajouter</button></div></div>`;
+  const cats = [...new Set(wish.map(w=>w.category))].filter(c=>CATS[c]);
+  if(ui.wishCat && !cats.includes(ui.wishCat)) ui.wishCat = "";
+  const list = ui.wishCat ? wish.filter(w=>w.category===ui.wishCat) : wish;
+  const filters = cats.length>1 ? `<div class="filters"><button class="chip" data-act="w-cat" data-v="" aria-pressed="${!ui.wishCat}">Toutes <span class="muted">${wish.length}</span></button>${cats.map(c=>`<button class="chip" data-act="w-cat" data-v="${c}" aria-pressed="${ui.wishCat===c}">${CATS[c].label} <span class="muted">${wish.filter(w=>w.category===c).length}</span></button>`).join("")}</div>` : "";
+  const total = wish.reduce((t,w)=>t + (+w.price||0), 0);
+  const wl = `<div class="section-title"><h2>Pièces à ajouter</h2>${total?`<span class="mono">${fmtPrice(total)} au total</span>`:""}</div>` + (wish.length
+    ? filters + `<div class="grid">${list.map(wishCard).join("")}</div>`
+    : `<div class="panel empty"><svg class="big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg><h2>Aucune envie pour l'instant</h2><p>Ajoute une pièce qui te fait envie, avec sa photo, sa marque et son prix, ou colle simplement le lien de la boutique.</p><button class="btn primary" data-act="wish-new">${ICONS.plus}Ajouter une envie</button></div>`);
+  const wouts = [...DB.outfits.values()].filter(isWishOutfit);
+  const wo = `<div class="section-title"><h2>Tenues avec tes envies</h2>${wish.length?`<button class="btn sm" data-act="new-outfit" data-v="wish">${ICONS.plus}Créer</button>`:""}</div>` + (wouts.length
+    ? `<div class="outfits">${wouts.map(outfitCard).join("")}</div>`
+    : `<div class="panel empty" style="padding:24px"><p>Imagine des looks avec les pièces que tu convoites, mélangées à ce que tu as déjà.${wish.length?"":" Ajoute d'abord une envie."}</p>${wish.length?`<button class="btn primary" data-act="new-outfit" data-v="wish">Composer un look</button>`:""}</div>`);
+  return head + wl + wo + `<div class="section-title"><h2>Chercher en boutique</h2></div>` + shopPanel() + `<p class="muted" style="font-size:12px;margin-top:12px">Pas encore de liens d'affiliation (Awin, Rakuten…) : ils viendront avec les flux produits.</p>`;
 }
 function shopPanel(){
   const S = ui.shop; const q = S.done || "";
@@ -937,14 +1560,14 @@ function mSettings(){
     <span class="muted" style="font-size:13px">Active les tags automatiques, le scan en lot, l'avis de styliste, les annonces et la recherche en boutique. Crée une clé sur console.anthropic.com (facturation à l'usage, quelques centimes par photo ou recherche). La clé reste dans ce navigateur et n'est envoyée qu'à l'API Claude. Ne l'utilise que sur ton propre appareil.</span></div>
     <div class="row" style="margin-bottom:18px">${k?`<button class="btn sm danger" data-act="key-del">Retirer la clé</button>`:""}<span class="muted" style="font-size:13px">${k?"Clé enregistrée.":"Aucune clé enregistrée."}</span></div>
     <div class="field"><span class="lab">Sauvegarde</span><div class="row"><button class="btn sm" data-act="export">Exporter mes données</button><label class="btn sm">Importer une sauvegarde<input class="vh" type="file" id="import-file" accept="application/json,.json"></label></div>
-    <span class="muted" style="font-size:13px">Tes données vivent dans ce navigateur : si tu vides l'historique du navigateur, elles disparaissent. Exporte-les pour les garder ou les passer sur un autre appareil.</span></div>${installBlock()}`;
+    <span class="muted" style="font-size:13px">${store.mode==="cloud" ? "Tes données sont enregistrées dans ton compte. L'export garde une copie de secours sur ton appareil." : "Tes données vivent dans ce navigateur : si tu vides l'historique du navigateur, elles disparaissent. Exporte-les, ou crée un compte."}</span></div>${installBlock()}`;
 }
 
 function viewRevente(){
   const ws = wearStats(); const t = today();
   const sleeping = items().map(i=>{ const w = ws[i.id]; const age = daysBetween(i.createdAt?.slice(0,10)||t, t); const idle = w ? daysBetween(w.last, t) : age; return {i, w, age, idle}; })
     .filter(x => (!x.w && x.age>=30) || x.idle>=90).sort((a,b)=>b.idle-a.idle);
-  const head = `${brandMobile()}<div class="head"><div><h1>À <span class="s">revendre</span></h1><p>Les pièces qui dorment dans ton placard.</p></div></div>`;
+  const head = `${brandMobile()}${backLink()}<div class="head"><div><h1>À <span class="s">revendre</span></h1><p>Les pièces qui dorment dans ton placard.</p></div></div>`;
   const stat = `<div class="stat"><div><b>${sleeping.length}</b><span>pièces à revoir</span></div><div><b>${items().filter(i=>!ws[i.id]).length}</b><span>jamais portées</span></div><div><b>${items().length?Math.round(Object.keys(ws).length/items().length*100):0} %</b><span>de la penderie portée</span></div></div>`;
   if(!sleeping.length) return head + stat + `<div class="panel empty"><p>Aucune pièce oubliée : rien n'est resté plus de 30 jours sans être porté depuis son ajout, ni plus de 90 jours depuis sa dernière sortie.</p></div>`;
   return head + stat + `<div class="panel"><div class="list">${sleeping.map(({i,w,idle})=>`<div class="li">${thumb(i)}<div class="body"><b>${esc(i.name)}</b><span class="muted" style="font-size:13px">${w?`Dernière fois il y a ${idle} jours`:`Jamais portée depuis ${idle} jours`}</span>
@@ -952,13 +1575,16 @@ function viewRevente(){
     <p class="muted" style="font-size:12px;margin-top:12px">Règle : jamais portée 30 jours après l'ajout, ou pas portée depuis 90 jours. La publication directe sur Vinted n'existe pas (pas d'API publique) : l'app rédige l'annonce, tu la colles.</p>`;
 }
 
+const VIEWS = {accueil:viewAccueil, dressing:viewDressing, tenues:viewTenues, jour:viewJour, envies:viewEnvies, styliste:viewStyliste, revente:viewRevente};
+const KEEP_FOCUS = ["q","chat-q","shop-q","wx-q"];
 function render(){
-  $("#tabs").innerHTML = navHTML(); $("#side-tabs").innerHTML = navHTML();
-  const v = {dressing:viewDressing, tenues:viewTenues, jour:viewJour, envies:viewEnvies, revente:viewRevente}[ui.tab];
-  const active = document.activeElement && document.activeElement.id;
-  const caret = active==="q" ? document.activeElement.selectionStart : null;
+  $("#tabs").innerHTML = navHTML(TABS, true); $("#side-tabs").innerHTML = navHTML(SIDE_TABS, false);
+  const sa = $("#side-account"); if(sa) sa.innerHTML = sideAccount();
+  const v = VIEWS[ui.tab] || viewAccueil;
+  const act = document.activeElement, aid = act && KEEP_FOCUS.includes(act.id) ? act.id : null;
+  let caret = null; try{ caret = aid ? act.selectionStart : null; }catch{}
   $("#view").innerHTML = v();
-  if(active==="q"){ const q=$("#q"); if(q){ q.focus(); q.setSelectionRange(caret,caret);} }
+  if(aid){ const n = document.getElementById(aid); if(n){ n.focus({preventScroll:true}); try{ if(caret!=null) n.setSelectionRange(caret,caret); }catch{} } }
   if(modal.render) modal.paint();
 }
 
@@ -967,8 +1593,11 @@ const modal = { render:null, state:{},
   open(fn, state={}){ this.render = fn; this.state = state; this.paint(); },
   paint(){ const el=$("#modal"); if(!this.render){ el.innerHTML=""; return; }
     const keep = el.querySelector(".sheet")?.scrollTop || 0;
+    const act = document.activeElement, aid = act && act.id && el.contains(act) && /^(INPUT|TEXTAREA)$/.test(act.tagName) ? act.id : null;
+    let caret = null; try{ caret = aid ? act.selectionStart : null; }catch{}
     el.innerHTML = `<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${this.render(this.state)}</div></div>`;
-    el.querySelector(".sheet").scrollTop = keep; },
+    el.querySelector(".sheet").scrollTop = keep;
+    if(aid){ const n = document.getElementById(aid); if(n){ n.focus({preventScroll:true}); try{ if(caret!=null) n.setSelectionRange(caret,caret); }catch{} } } },
   close(){ this.render = null; this.state = {}; $("#modal").innerHTML = ""; }
 };
 const sheetHead = t => `<div class="sheet-head"><h2>${t}</h2><button class="x" data-act="close" aria-label="Fermer">${ICONS.x}</button></div>`;
@@ -999,8 +1628,9 @@ function mEdit(s){
         ${it.photo&&store.ai&&store.aiImages&&!s.busy?`<button class="btn sm" data-act="ed-retag" style="margin-top:8px">${ICONS.spark}Relancer l'analyse</button>`:""}</div>
     </div>
     <div class="field"><label for="ed-name">Nom</label><input class="input" id="ed-name" value="${esc(it.name)}" placeholder="Ex. Chemise Oxford bleue"></div>
-    <div class="two"><div class="field"><label for="ed-brand">Marque</label><input class="input" id="ed-brand" value="${esc(it.brand)}"></div>
-      <div class="field"><label for="ed-size">Taille</label><input class="input" id="ed-size" value="${esc(it.size)}" placeholder="M, 42…"></div></div>
+    <div class="field"><label for="ed-brand">Marque</label><input class="input" id="ed-brand" value="${esc(it.brand)}"></div>
+    <div class="two"><div class="field"><label for="ed-size">Taille</label><input class="input" id="ed-size" value="${esc(it.size)}" placeholder="M, 42…"></div>
+      <div class="field"><label for="ed-price">Prix payé (€)</label><input class="input" id="ed-price" inputmode="decimal" value="${it.price!=null&&it.price!==""?String(it.price).replace(".", ","):""}" placeholder="49,90"></div></div>
     <div class="two"><div class="field"><label for="ed-cat">Catégorie</label><select class="input" id="ed-cat">${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${it.category===k?"selected":""}>${v.one}</option>`).join("")}</select></div>
       <div class="field"><label for="ed-type">Type</label><select class="input" id="ed-type">${CATS[it.category].types.map(t=>`<option ${it.type===t?"selected":""}>${t}</option>`).join("")}</select></div></div>
     <div class="field"><span class="lab">Couleurs (la première est la dominante)</span>${chipsField("colors", COLOR_LABEL, it.colors)}</div>
@@ -1012,7 +1642,7 @@ function mEdit(s){
 }
 function readEditFields(s){
   const g = id => $("#"+id)?.value ?? "";
-  Object.assign(s.item, {name:g("ed-name").trim(), brand:g("ed-brand").trim(), size:g("ed-size").trim(), material:g("ed-mat").trim(), warmth:+g("ed-warm")||1, category:g("ed-cat")||s.item.category, type:g("ed-type")||s.item.type});
+  Object.assign(s.item, {name:g("ed-name").trim(), brand:g("ed-brand").trim(), size:g("ed-size").trim(), price:parsePrice(g("ed-price")), material:g("ed-mat").trim(), warmth:+g("ed-warm")||1, category:g("ed-cat")||s.item.category, type:g("ed-type")||s.item.type});
 }
 function newItem(extra={}){ return {kind:"item", id:uid("item"), name:"", brand:"", size:"", category:"haut", type:"T-shirt", colors:[], seasons:[], styles:[], material:"", warmth:1, createdAt:new Date().toISOString(), ...extra}; }
 
@@ -1022,7 +1652,7 @@ function mItem(s){
   const inOutfits = [...DB.outfits.values()].filter(o=>(o.itemIds||[]).includes(i.id));
   return sheetHead(esc(i.name)) + `<div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)">
     <div>${thumb(i)}</div>
-    <dl class="kv"><dt>Catégorie</dt><dd>${CATS[i.category].one} · ${esc(i.type)}</dd>${i.brand?`<dt>Marque</dt><dd>${esc(i.brand)}</dd>`:""}${i.size?`<dt>Taille</dt><dd>${esc(i.size)}</dd>`:""}
+    <dl class="kv"><dt>Catégorie</dt><dd>${CATS[i.category].one} · ${esc(i.type)}</dd>${i.brand?`<dt>Marque</dt><dd>${esc(i.brand)}</dd>`:""}${i.size?`<dt>Taille</dt><dd>${esc(i.size)}</dd>`:""}${fmtPrice(i.price)?`<dt>Prix payé</dt><dd>${fmtPrice(i.price)}${w?` · <b>${fmtPrice(i.price/w.count)}</b> par port`:""}</dd>`:""}
       <dt>Couleurs</dt><dd>${(i.colors||[]).map(c=>COLOR_LABEL[c]).join(", ")||"—"}</dd><dt>Saisons</dt><dd>${(i.seasons||[]).map(x=>SEASONS[x]).join(", ")||"—"}</dd>
       <dt>Styles</dt><dd>${(i.styles||[]).map(x=>STYLES[x]).join(", ")||"—"}</dd>${i.material?`<dt>Matière</dt><dd>${esc(i.material)}</dd>`:""}
       <dt>Porté</dt><dd>${w?`${w.count} fois, dernière le ${new Date(w.last+"T12:00").toLocaleDateString("fr-FR")}`:"jamais"}</dd>
@@ -1048,9 +1678,10 @@ function mLibrary(s){
 
 function mOutfit(s){
   const slots = [["haut","Haut"],["bas","Bas"],["robe","Robe (à la place haut + bas)"],["couche","Veste"],["chaussures","Chaussures"],["accessoire","Accessoire"]];
-  const sel = s.sel; const chosen = Object.values(sel).filter(Boolean).map(id=>DB.items.get(id)).filter(Boolean);
+  const sel = s.sel; const chosen = Object.values(sel).filter(Boolean).map(id=>DB.items.get(id)||DB.wish.get(id)).filter(Boolean);
   const sc = chosen.length>=2 ? colorScore(chosen) : null;
-  return sheetHead(s.id?"Modifier la tenue":"Nouvelle tenue") + slots.map(([k,l])=>{ const list = byCat(k); if(!list.length) return ""; return `<div class="slot"><div class="mono muted" style="margin-bottom:6px">${l}</div><div class="strip">${list.map(i=>`<button data-act="o-pick" data-f="${k}" data-id="${i.id}" aria-pressed="${sel[k]===i.id}" aria-label="${esc(i.name)}">${thumb(i)}</button>`).join("")}</div></div>`; }).join("")
+  const wishToggle = DB.wish.size ? `<label class="row" style="font-size:14px;margin:-6px 0 14px"><input type="checkbox" id="o-withwish" ${s.withWish?"checked":""} style="width:18px;height:18px;accent-color:var(--accent)"> Inclure mes envies ${ICONS.envies.replace("<svg ", '<svg width="16" height="16" style="color:var(--accent)" ')}</label>` : "";
+  return sheetHead(s.id?"Modifier la tenue":"Nouvelle tenue") + wishToggle + slots.map(([k,l])=>{ const list = [...byCat(k), ...(s.withWish?[...DB.wish.values()].filter(w=>w.category===k):[])]; if(!list.length) return ""; return `<div class="slot"><div class="mono muted" style="margin-bottom:6px">${l}</div><div class="strip">${list.map(i=>`<button data-act="o-pick" data-f="${k}" data-id="${i.id}" aria-pressed="${sel[k]===i.id}" aria-label="${esc(i.name)}${i.kind==="wish"?" (envie)":""}">${thumb(i)}${i.kind==="wish"?`<span class="wtag">${ICONS.envies}</span>`:""}</button>`).join("")}</div></div>`; }).join("")
     + (sc!==null?`<p style="margin:0 0 12px;font-size:14px">Accord des couleurs : <b style="color:${sc>=.85?"var(--good)":sc>=.5?"var(--warn)":"var(--bad)"}">${sc>=.85?"harmonieux":sc>=.5?"à oser":"risqué"}</b></p>`:"")
     + `<div class="field"><label for="o-name">Nom</label><input class="input" id="o-name" value="${esc(s.name||"")}" placeholder="Ex. Lundi au bureau"></div>
     <div class="field"><span class="lab">Occasion</span><div class="chips">${Object.entries(OCCASIONS).map(([k,v])=>`<button class="chip" data-act="o-occ" data-v="${k}" aria-pressed="${s.occasion===k}">${v.label}</button>`).join("")}</div></div>
@@ -1179,16 +1810,12 @@ async function loadDemo(){
   for(const [d,o] of plan) wears.push({kind:"wear", id:uid("wear"), date:iso(new Date(now-d*864e5)), outfitId:outs[o].id, itemIds:outs[o].itemIds, demo:true, createdAt:new Date().toISOString()});
   const wish = [{...CATALOG.find(c=>c.id==="c27")},{...CATALOG.find(c=>c.id==="c23")}].map(c=>({...c, kind:"wish", id:uid("wish"), catalogId:c.id, demo:true, createdAt:new Date().toISOString()}));
   const all = [...docs, ...outs, ...wears, ...wish];
-  for(const d of all) DB[KIND_OF[d.kind]].set(d.id, d);
-  ui.jour.picks = null; render();
-  if(store.mode==="db"){ for(const d of all){ const {id, ...data} = d; try{ await store.col.doc(id).set(data); }catch(e){ toast("Enregistrement refusé."); break; } } }
-  else localSave();
+  ui.jour.picks = null; await saveMany(all);
   toast("Garde-robe d'exemple chargée.");
 }
 async function clearDemo(){
-  const ids = []; for(const [k,m] of Object.entries(DB)) for(const [id,d] of m) if(d.demo){ ids.push(id); m.delete(id); }
-  ui.jour.picks = null; render();
-  if(store.mode==="db"){ for(const id of ids){ try{ await store.col.doc(id).delete(); }catch{} } } else localSave();
+  const ids = []; for(const m of Object.values(DB)) for(const [id,d] of m) if(d.demo) ids.push(id);
+  ui.jour.picks = null; await removeMany(ids);
   toast("Exemples retirés.");
 }
 
@@ -1197,7 +1824,32 @@ document.addEventListener("click", async e => {
   const a = el.dataset.act, v = el.dataset.v, id = el.dataset.id, s = modal.state;
   if(a==="scrim"){ if(e.target===el) modal.close(); return; }
   switch(a){
-    case "tab": modal.close(); setTab(v); break;
+    case "tab": modal.close(); if(el.dataset.cal) ui.tenuesView = "cal"; setTab(v); break;
+    case "g-tab": readGate(); auth.tab = v; auth.status = ""; auth.err = false; renderGate(); $("#g-user")?.focus(); break;
+    case "g-guest": LS.set("cintre.guest", true); enterGuest(); toast("Mode sans compte : tes pièces restent sur cet appareil."); break;
+    case "g-open": auth.tab = v || "login"; showGate(""); break;
+    case "account": modal.open(mAccount, {}); break;
+    case "logout": logout(false); break;
+    case "logout-yes": logout(true); break;
+    case "sync-now": syncNow(); break;
+    case "transfer": modal.close(); transferGuest(); break;
+    case "transfer-skip": LS.set("cintre.v1.skip", true); render(); break;
+    case "chat-p": askStylist(PROMPTS[+v][1]); break;
+    case "chat-clear": chat.list = []; LS.set(chatKey(), []); render(); break;
+    case "w-cat": ui.wishCat = v; render(); break;
+    case "wish-new": modal.open(mWish, {wish:true, isNew:true, item:newWish()}); break;
+    case "wish-edit": { const w = DB.wish.get(id); if(w) modal.open(mWish, {wish:true, isNew:false, item:JSON.parse(JSON.stringify(w))}); break; }
+    case "wi-link": wishFromLink(s); break;
+    case "wi-nophoto": readWishFields(s); s.crop = null; s.noPhoto = true; modal.paint(); break;
+    case "wi-del": modal.close(); await replaceInOutfits(id, null); await del("wish", id); toast("Envie retirée."); break;
+    case "wi-save": {
+      readWishFields(s); const it = s.item;
+      if(!it.name){ s.err = "Donne un nom à la pièce."; modal.paint(); break; }
+      if(!(it.colors||[]).length){ s.err = "Choisis au moins une couleur : elle sert à calculer avec quelles tenues la pièce irait."; modal.paint(); break; }
+      s.saving = true; modal.paint();
+      try{ if(s.crop && s.crop.src) it.photo = await exportCrop(s.crop); else if(s.noPhoto) delete it.photo; }catch{ if(s.crop) it.photo = s.crop.src; }
+      if(!it.shop && it.url){ try{ it.shop = new URL(it.url).hostname.replace(/^www\./, ""); }catch{} }
+      modal.close(); await put({...it, kind:"wish"}); toast(s.isNew ? "Ajouté à tes envies." : "Envie mise à jour."); break; }
     case "close": modal.close(); break;
     case "add": modal.open(mAdd); break;
     case "demo": loadDemo(); break;
@@ -1218,7 +1870,7 @@ document.addEventListener("click", async e => {
       modal.close(); ui.jour.picks = null; await del("item", id); toast("Pièce supprimée."); break; }
     case "it-wear": await logWear([id]); toast("Noté pour aujourd'hui."); modal.paint(); break;
     case "manual": modal.open(mEdit, {item:newItem(), isNew:true}); break;
-    case "ed-chip": { readEditFields(s); const f = el.dataset.f; const arr = s.item[f] || (s.item[f]=[]); const k = arr.indexOf(v); k>=0 ? arr.splice(k,1) : arr.push(v); modal.paint(); break; }
+    case "ed-chip": { s.wish ? readWishFields(s) : readEditFields(s); const f = el.dataset.f; const arr = s.item[f] || (s.item[f]=[]); const k = arr.indexOf(v); k>=0 ? arr.splice(k,1) : arr.push(v); modal.paint(); break; }
     case "ed-retag": if(s.file) analysePhoto(s.file, s); else { s.aiNote = "Reprends la photo pour relancer l'analyse."; modal.paint(); } break;
     case "ed-save": {
       readEditFields(s); const it = s.item;
@@ -1233,10 +1885,11 @@ document.addEventListener("click", async e => {
       else { ui.jour.picks = null; await put({...newItem(), ...c, kind:"item", id:uid("item"), catalogId:c.id, createdAt:new Date().toISOString()}); }
       toast(`${c.name} ajouté${s.target==="wish"?" à tes envies":""}.`); break; }
     case "wish-add": { const c = CATALOG.find(x=>x.id===v); if([...DB.wish.values()].some(w=>w.catalogId===v)){ toast("Déjà dans tes envies."); break; } await put({...c, kind:"wish", id:uid("wish"), catalogId:c.id, createdAt:new Date().toISOString()}); toast("Ajouté à tes envies."); break; }
-    case "wish-del": await del("wish", id); break;
-    case "wish-bought": { const w = DB.wish.get(id); const {kind, id:_, ...rest} = w; await put({...newItem(), ...rest, kind:"item", id:uid("item"), demo:false, createdAt:new Date().toISOString()}); await del("wish", id); ui.jour.picks = null; toast("Ajouté à ta garde-robe."); break; }
-    case "new-outfit": modal.open(mOutfit, {sel:{}, seasons:[]}); break;
-    case "outfit": { const o = DB.outfits.get(id); const sel = {}; for(const i of outfitItems(o)) sel[i.category] = i.id; modal.open(mOutfit, {id, sel, name:o.name, occasion:o.occasion, seasons:[...(o.seasons||[])]}); break; }
+    case "wish-del": await replaceInOutfits(id, null); await del("wish", id); break;
+    case "wish-bought": { const w = DB.wish.get(id); const {kind, id:_, note, shop, url, ...rest} = w; const nid = uid("item");
+      await put({...newItem(), ...rest, kind:"item", id:nid, demo:false, createdAt:new Date().toISOString()}); await replaceInOutfits(id, nid); await del("wish", id); ui.jour.picks = null; toast("Ajouté à ta garde-robe."); break; }
+    case "new-outfit": modal.open(mOutfit, {sel:{}, seasons:[], withWish:v==="wish"}); break;
+    case "outfit": { const o = DB.outfits.get(id); const sel = {}; for(const i of outfitItems(o)) sel[i.category] = i.id; modal.open(mOutfit, {id, sel, name:o.name, occasion:o.occasion, seasons:[...(o.seasons||[])], withWish:isWishOutfit(o)}); break; }
     case "o-pick": { s.name = $("#o-name")?.value; const f = el.dataset.f; s.sel[f] = s.sel[f]===id ? null : id; if(f==="robe" && s.sel.robe){ s.sel.haut=null; s.sel.bas=null; } if((f==="haut"||f==="bas") && s.sel[f]) s.sel.robe=null; modal.paint(); break; }
     case "o-occ": s.name = $("#o-name")?.value; s.occasion = s.occasion===v ? null : v; modal.paint(); break;
     case "o-season": { s.name = $("#o-name")?.value; const k = s.seasons.indexOf(v); k>=0 ? s.seasons.splice(k,1) : s.seasons.push(v); modal.paint(); break; }
@@ -1245,7 +1898,7 @@ document.addEventListener("click", async e => {
       if(ids.length<2){ s.err = "Choisis au moins deux pièces."; modal.paint(); break; }
       const prev = s.id ? DB.outfits.get(s.id) : null;
       const o = {kind:"outfit", id:s.id||uid("outfit"), name:s.name||"Tenue sans nom", itemIds:ids, occasion:s.occasion||null, seasons:s.seasons, fav:prev?.fav||false, createdAt:prev?.createdAt||new Date().toISOString()};
-      modal.close(); await put(o); toast("Tenue enregistrée."); break; }
+      modal.close(); await put(o); toast(isWishOutfit(o) ? "Look enregistré dans « Tenues avec tes envies »." : "Tenue enregistrée."); break; }
     case "o-del": modal.close(); await del("outfit", id); toast("Tenue supprimée."); break;
     case "fav": { const o = DB.outfits.get(id); await put({...o, fav:!o.fav}); break; }
     case "wear-outfit": { const o = DB.outfits.get(id); await logWear(o.itemIds, o.id); toast("Noté pour aujourd'hui."); break; }
@@ -1283,6 +1936,7 @@ document.addEventListener("change", e => {
     else if(t.id.startsWith("file-batch")) onBatch(f);
     else if(t.id==="file-lib") onLibPhoto(f, s);
     else if(t.id==="import-file") importBackup(f);
+    else if(t.id.startsWith("file-wish")) onWishPhoto(f, s);
     t.value = "";
   }
   else if(t.id==="set-key"){ saveKey(t.value.trim()); toast(t.value.trim()?"Clé enregistrée.":"Clé retirée."); }
@@ -1290,6 +1944,8 @@ document.addEventListener("change", e => {
   else if(t.id==="f-season"){ ui.season = t.value; render(); }
   else if(t.id==="f-sort"){ ui.sort = t.value; render(); }
   else if(t.id==="j-rain"){ wx.manual = !!wx.data; ui.jour.rain = t.checked; ui.jour.picks = null; ui.jour.idx=0; render(); }
+  else if(t.id==="wi-cat"){ readWishFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
+  else if(t.id==="o-withwish"){ s.name = $("#o-name")?.value; s.withWish = t.checked; if(!t.checked) for(const k of Object.keys(s.sel)) if(DB.wish.has(s.sel[k])) s.sel[k] = null; modal.paint(); }
   else if(t.id==="ed-cat"){ readEditFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
   else if(t.dataset.act==="b-tog"){ s.found[+t.dataset.v].keep = t.checked; modal.paint(); }
 });
@@ -1297,7 +1953,18 @@ document.addEventListener("input", e => {
   const t = e.target;
   if(t.id==="q"){ ui.q = t.value; render(); }
   else if(t.id==="shop-q"){ ui.shop.q = t.value; }
+  else if(t.id==="chat-q"){ chat.draft = t.value; t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; }
+  else if(t.id==="wx-q"){ wx.q = t.value; }
+  else if(t.id==="wi-zoom"){ const c = modal.state.crop; if(c){ c.z = +t.value/100; const img = $("#crop-img"); if(img) img.style.cssText = cropGeom(c).css; const o = $("#wi-zoom-v"); if(o) o.textContent = t.value + " %"; } }
   else if(t.id==="lib-q"){ const s = modal.state; s.q = t.value; s.matches = null; const pos = t.selectionStart; modal.paint(); const n=$("#lib-q"); n.focus(); n.setSelectionRange(pos,pos); }
+});
+document.addEventListener("submit", e => {
+  const f = e.target.dataset.form;
+  if(f==="gate"){ e.preventDefault(); gateSubmit(); }
+  else if(f==="chat"){ e.preventDefault(); const q = $("#chat-q")?.value || ""; askStylist(q); }
+});
+document.addEventListener("keydown", e => {
+  if(e.target.id==="chat-q" && e.key==="Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); askStylist(e.target.value); }
 });
 document.addEventListener("submit", async e => {
   if(e.target.dataset.form !== "shop") return;
@@ -1314,9 +1981,8 @@ async function importBackup(file){
   try{
     const data = JSON.parse(await file.text());
     const docs = data && data.docs; if(!docs || typeof docs !== "object") throw 0;
-    let n = 0; for(const [id,d] of Object.entries(docs)){ const k = KIND_OF[d && d.kind]; if(k){ DB[k].set(id, {...d, id}); n++; } }
-    if(store.mode==="db"){ for(const [id,d] of Object.entries(docs)){ if(!KIND_OF[d && d.kind]) continue; const {id:_, ...rest} = d; try{ await store.col.doc(id).set(rest); }catch{} } } else localSave();
-    ui.jour.picks = null; modal.close(); render(); toast(`${n} éléments importés.`);
+    const list = Object.entries(docs).filter(([,d]) => d && KIND_OF[d.kind]).map(([id,d]) => ({...d, id}));
+    ui.jour.picks = null; modal.close(); await saveMany(list); toast(`${list.length} éléments importés.`);
   }catch{ toast("Ce fichier n'est pas une sauvegarde Cintre."); }
 }
 document.addEventListener("keydown", e => { if(e.key==="Escape" && modal.render) modal.close(); });
@@ -1326,10 +1992,12 @@ document.addEventListener("click", e => { /* enregistrement du lot */
   modal.close(); ui.jour.picks = null;
   (async()=>{ for(const f of keep){ const {keep:_, ...doc} = f; await put(doc); } toast(`${keep.length} pièce(s) ajoutée(s).`); })();
 });
-window.addEventListener("hashchange", ()=>{ const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h) && h!==ui.tab){ ui.tab = h; render(); } });
+window.addEventListener("hashchange", ()=>{ const h = location.hash.slice(1); if(VIEWS[h] && h!==ui.tab){ ui.tab = h; render(); } });
+addEventListener("online", () => { if(store.mode==="cloud") flushSoon(0); });
+document.addEventListener("visibilitychange", () => { if(!document.hidden && store.mode==="cloud" && Date.now() - (store.pulledAt||0) > 60e3) syncNow(); });
 
 (function boot(){
-  const h = location.hash.slice(1); if(TABS.some(t=>t[0]===h)) ui.tab = h;
+  const h = location.hash.slice(1); if(VIEWS[h]) ui.tab = h;
   wxApply(); render(); initStore();
   if(wx.loc && wxStale()) wxFetch();
 })();
