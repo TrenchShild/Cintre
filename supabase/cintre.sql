@@ -1,6 +1,5 @@
 -- Cintre : table de synchronisation des comptes
 -- À lancer une seule fois dans Supabase : SQL Editor → New query → coller → Run.
--- Ne touche pas aux tables de Vestia (wardrobes) : Cintre a sa propre table.
 
 create table if not exists public.cintre_docs (
   user_id    uuid        not null default auth.uid() references auth.users (id) on delete cascade,

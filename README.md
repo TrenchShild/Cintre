@@ -11,14 +11,12 @@ Prototype de dressing numérique : une application web mobile, installable. Tout
 
 ## Mise en place de Supabase (une seule fois)
 
-L'app utilise le projet Supabase de Vestia (`zvxzzojzbytyrndangro`), avec sa propre table : la table `wardrobes` de Vestia n'est pas touchée.
+Projet Supabase : `qogdwrfensailwsknnxc` (adresse et clé publique dans `CLOUD`, en haut du module « Comptes » de `index.html`).
 
 1. **Créer la table** : Supabase → SQL Editor → New query → coller le contenu de `supabase/cintre.sql` → Run.
 2. **Autoriser l'inscription sans e-mail** : Authentication → Sign In / Providers → Email.
    - « Allow new users to sign up » : activé.
-   - « Confirm email » : désactivé. Les identifiants sont convertis en adresses techniques (`identifiant@users.vestia.invalid`) qui ne reçoivent pas d'e-mail.
-
-Les comptes Vestia existants fonctionnent aussi dans Cintre, avec le même identifiant et le même mot de passe.
+   - « Confirm email » : désactivé. Les identifiants sont convertis en adresses techniques (`identifiant@users.cintre.invalid`) qui ne reçoivent pas d'e-mail.
 
 ## Maintenance
 
