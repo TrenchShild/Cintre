@@ -867,7 +867,7 @@ if(STANDALONE && "serviceWorker" in navigator && window.isSecureContext && locat
 /* Identifiant + mot de passe : l'identifiant devient une adresse technique, jamais utilisée pour envoyer d'e-mail.
    Chaque élément (pièce, tenue, envie, jour porté) est une ligne de la table cintre_docs, protégée par RLS.
    Les modifications passent par une file d'attente locale : l'app marche hors ligne et envoie tout au retour du réseau. */
-const CLOUD = { url:"https://qogdwrfensailwsknnxc.supabase.co", key:"__CLE_PUBLIQUE__",
+const CLOUD = { url:"https://qogdwrfensailwsknnxc.supabase.co", key:"sb_publishable_q9ufRFCA9ZnoQQlqb3jgTg_sicH-1D2",
   domain:"users.cintre.invalid", table:"cintre_docs", sdk:"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm" };
 const LS = {
   get(k, d=null){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch{ return d; } },
