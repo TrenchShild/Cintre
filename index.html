@@ -1747,14 +1747,34 @@ async function lensSearch(s){
   window.open("https://lens.google.com/", "_blank", "noopener");
   s.linkMsg = "Sans compte, importe toi-même la photo dans Google Lens (icône appareil photo), puis colle ici le lien du produit."; modal.paint();
 }
+/* Image copiée (depuis Google Lens, Google Images, un site…) → photo de la pièce */
+async function pasteImage(s){
+  readEditFields(s);
+  try{
+    if(!navigator.clipboard || !navigator.clipboard.read) throw {code:"unsupported"};
+    const items = await navigator.clipboard.read(); let blob = null;
+    for(const ci of items){ const t = ci.types.find(x => /^image\//.test(x)); if(t){ blob = await ci.getType(t); break; } }
+    if(!blob){
+      const txt = (await navigator.clipboard.readText().catch(() => "")).trim();
+      if(/^https?:\/\/\S+$/.test(txt)){ const ph = await webPhoto(txt); if(ph){ s.webPhoto = ph; s.linkMsg = "Image récupérée depuis le lien copié. Touche « Utiliser la photo du site »."; modal.paint(); return; } }
+      throw {code:"empty"};
+    }
+    const im = await fileToImage(blob); if(modal.state!==s) return;
+    s.webPhoto = toDataURL(drawTo(im, 560)); if(s.item.photo!==s.webPhoto) s.ownPhoto = s.item.photo; s.item.photo = s.webPhoto;
+    s.linkMsg = "Image collée et utilisée comme photo. Touche « Détourer » si elle a un fond.";
+  }catch(e){
+    s.linkMsg = e?.code==="empty" ? "Aucune image dans le presse-papiers : appui long sur l'image → « Copier », puis réessaie." : "Ton navigateur ne permet pas de coller une image ici : enregistre-la plutôt, puis ajoute-la avec « Galerie ».";
+  }
+  if(modal.state===s) modal.paint();
+}
 function findBlock(s){
   const it = s.item, q = encodeURIComponent([it.brand, it.name].filter(Boolean).join(" ") || "vêtement");
   return `<div class="panel" style="background:var(--sunk);box-shadow:none;padding:14px;margin-bottom:16px">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:14px">Retrouver la pièce en ligne</b><span class="muted" style="font-size:12px">pré-remplit la fiche</span></div>
-    <div class="row" style="margin-bottom:10px">${it.photo?`<button class="btn sm primary" data-act="ed-lens" ${s.lensBusy?"disabled":""}>${s.lensBusy?'<span class="spinner"></span>':ICONS.camera}Rechercher la photo</button>`:""}<a class="btn sm" href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">${ICONS.search}Chercher par le nom</a>${s.lensLink?`<a class="btn sm" href="${esc(s.lensLink)}" target="_blank" rel="noopener">Ouvrir Google Lens</a>`:""}</div>
+    <div class="row" style="margin-bottom:10px">${it.photo?`<button class="btn sm primary" data-act="ed-lens" ${s.lensBusy?"disabled":""}>${s.lensBusy?'<span class="spinner"></span>':ICONS.camera}Rechercher la photo</button>`:""}<a class="btn sm" href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">${ICONS.search}Shopping</a><a class="btn sm" href="https://www.google.com/search?tbm=isch&q=${q}" target="_blank" rel="noopener">Images</a><a class="btn sm" href="https://www.vinted.fr/catalog?search_text=${q}" target="_blank" rel="noopener">Vinted</a><button class="btn sm" data-act="ed-paste">Coller une image</button>${s.lensLink?`<a class="btn sm" href="${esc(s.lensLink)}" target="_blank" rel="noopener">Ouvrir Google Lens</a>`:""}</div>
     <div class="row" style="flex-wrap:nowrap"><input class="input" id="ed-url" type="url" inputmode="url" autocapitalize="none" value="${esc(it.url||"")}" placeholder="Colle le lien de la page produit" style="flex:1;min-width:0;box-shadow:none"><button class="btn" data-act="ed-link" ${s.linkBusy?"disabled":""}>${s.linkBusy?'<span class="spinner"></span>':ICONS.spark}<span>Remplir</span></button></div>
-    <p class="muted" style="font-size:12px;margin:8px 0 0">${esc(s.linkMsg || "« Rechercher la photo » ouvre Google Lens sur ta photo. Copie le lien du produit trouvé, colle-le ici : nom, marque, prix, catégorie, couleur et photo du site sont remplis.")}</p>
-    ${s.webPhoto ? `<div class="row" style="flex-wrap:nowrap;gap:12px;margin-top:12px"><div style="width:64px;flex:none">${thumb({photo:s.webPhoto})}</div><div class="row" style="flex:1">${it.photo===s.webPhoto ? `<span class="muted" style="font-size:13px">Photo du site utilisée.</span>${s.ownPhoto?`<button class="btn sm ghost" data-act="ed-ownphoto">Reprendre ma photo</button>`:""}` : `<button class="btn sm" data-act="ed-webphoto">Utiliser la photo du site</button>`}</div></div>` : ""}
+    <p class="muted" style="font-size:12px;margin:8px 0 0">${esc(s.linkMsg || "« Rechercher la photo » ouvre Google Lens sur ta photo. Copie le lien d'une page qui montre la pièce (boutique, Vinted, ancienne page produit) et colle-le ici : nom, marque, prix, catégorie, couleur et photo sont remplis. Pièce plus en vente ? Copie juste son image et touche « Coller une image ».")}</p>
+    ${s.webPhoto ? `<div class="row" style="flex-wrap:nowrap;gap:12px;margin-top:12px"><div style="width:64px;flex:none">${thumb({photo:s.webPhoto})}</div><div class="row" style="flex:1">${it.photo===s.webPhoto ? `<span class="muted" style="font-size:13px">Photo trouvée utilisée.</span>${s.ownPhoto?`<button class="btn sm ghost" data-act="ed-ownphoto">Reprendre ma photo</button>`:""}` : `<button class="btn sm" data-act="ed-webphoto">Utiliser la photo du site</button>`}</div></div>` : ""}
   </div>`;
 }
 
@@ -2251,6 +2271,7 @@ document.addEventListener("click", async e => {
       openCut(im, async r => { modal.close(); await put({...DB.items.get(id), photo:r.photo}); toast("Photo détourée."); }); break; }
     case "bz-undo": s.rects.pop(); modal.paint(); break;
     case "ed-link": itemFromLink(s); break;
+    case "ed-paste": pasteImage(s); break;
     case "ed-lens": lensSearch(s); break;
     case "ed-webphoto": readEditFields(s); if(s.item.photo!==s.webPhoto) s.ownPhoto = s.item.photo; s.item.photo = s.webPhoto; modal.paint(); break;
     case "ed-ownphoto": readEditFields(s); s.item.photo = s.ownPhoto; modal.paint(); break;
