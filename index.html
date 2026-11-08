@@ -368,6 +368,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .bz-r{position:absolute;border:2.5px solid var(--accent);background:rgba(79,70,229,.14);border-radius:6px;pointer-events:none}
 .bz-r span{position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font:700 11px/1 var(--f-body);padding:3px 7px;border-radius:999px}
 .bz-r.tmp{border-style:dashed}
+.pick-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+.pick-strip button{flex:none;width:72px;height:90px;padding:0;border:0;border-radius:12px;overflow:hidden;background:var(--surface);display:grid;place-items:center}
+.pick-strip button[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--accent)}
+.pick-strip img{width:100%;height:100%;object-fit:cover}
 .scan-row select{padding:6px 8px;font-size:13px;box-shadow:none;background:var(--sunk);width:auto;max-width:100%}
 </style>
 
@@ -1685,10 +1689,12 @@ async function fetchProduct(rawUrl){
   let prod = null; try{ prod = findProduct(JSON.parse(d.ld || "null")); }catch{}
   const brand = prod && (typeof prod.brand==="string" ? prod.brand : prod.brand?.name);
   const offer = prod && [].concat(prod.offers||[])[0];
-  const img = [].concat(prod?.image || [])[0];
+  const imgs = [...[].concat(prod?.image || []), ...[].concat(prod?.offers||[]).flatMap(o => [].concat(o?.image||[])), d.image]
+    .map(x => typeof x==="string" ? x : x?.url || x?.contentUrl).filter(x => typeof x==="string" && /^https?:\/\//.test(x));
+  const images = [...new Set(imgs)].slice(0, 12), img = images[0];
   const name = String(prod?.name || d.title || "").split(/\s[|–—-]\s/)[0].trim().slice(0, 80);
   return {url:u.href, name, brand: brand ? String(brand).slice(0,40) : "", price: parsePrice(offer?.price ?? offer?.lowPrice ?? d.price),
-    color: prod?.color ? String(prod.color) : "", image: (typeof img==="string" ? img : img?.url) || d.image?.url || "",
+    color: prod?.color ? String(prod.color) : "", image: img || "", images,
     shop: String(d.publisher || u.hostname.replace(/^www\./, "")).slice(0,40), desc: String(prod?.description || d.description || "").slice(0, 300)};
 }
 /* Photo du site : copie locale si le site l'autorise, sinon adresse distante */
@@ -1710,7 +1716,8 @@ async function itemFromLink(s){
     const g = guessFromText(`${p.name} ${p.color} ${p.desc}`), gn = guessFromText(`${p.name} ${p.color}`);
     if(g.category && !s.catTouched){ it.category = gn.category || g.category; it.type = gn.type || g.type; got.push("catégorie"); }
     if(gn.colors){ it.colors = gn.colors; got.push("couleur"); }
-    if(p.image){ s.linkMsg = "Récupération de la photo…"; modal.paint(); const ph = await webPhoto(p.image); if(modal.state!==s) return; if(ph){ s.webPhoto = ph; got.push("photo du site"); } }
+    s.webImages = p.images.length > 1 ? p.images : null; s.pickedImg = 0;
+    if(p.image){ s.linkMsg = "Récupération de la photo…"; modal.paint(); const ph = await webPhoto(p.image); if(modal.state!==s) return; if(ph){ s.webPhoto = ph; got.push(p.images.length > 1 ? `${p.images.length} photos du site` : "photo du site"); } }
     s.linkMsg = got.length ? `Rempli : ${got.join(", ")}. Vérifie avant d'enregistrer.` : "Rien de lisible sur cette page. Remplis les champs à la main.";
   }catch(e){ if(modal.state!==s) return; s.linkMsg = e?.code==="bad_url" ? "Ce lien n'est pas valide : colle l'adresse complète de la page produit." : "Impossible de lire cette page (site protégé ou limite du service atteinte). Remplis les champs à la main."; }
   s.linkBusy = false; modal.paint();
@@ -1774,6 +1781,7 @@ function findBlock(s){
     <div class="row" style="margin-bottom:10px">${it.photo?`<button class="btn sm primary" data-act="ed-lens" ${s.lensBusy?"disabled":""}>${s.lensBusy?'<span class="spinner"></span>':ICONS.camera}Rechercher la photo</button>`:""}<a class="btn sm" href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">${ICONS.search}Shopping</a><a class="btn sm" href="https://www.google.com/search?tbm=isch&q=${q}" target="_blank" rel="noopener">Images</a><a class="btn sm" href="https://www.vinted.fr/catalog?search_text=${q}" target="_blank" rel="noopener">Vinted</a><button class="btn sm" data-act="ed-paste">Coller une image</button>${s.lensLink?`<a class="btn sm" href="${esc(s.lensLink)}" target="_blank" rel="noopener">Ouvrir Google Lens</a>`:""}</div>
     <div class="row" style="flex-wrap:nowrap"><input class="input" id="ed-url" type="url" inputmode="url" autocapitalize="none" value="${esc(it.url||"")}" placeholder="Colle le lien de la page produit" style="flex:1;min-width:0;box-shadow:none"><button class="btn" data-act="ed-link" ${s.linkBusy?"disabled":""}>${s.linkBusy?'<span class="spinner"></span>':ICONS.spark}<span>Remplir</span></button></div>
     <p class="muted" style="font-size:12px;margin:8px 0 0">${esc(s.linkMsg || "« Rechercher la photo » ouvre Google Lens sur ta photo. Copie le lien d'une page qui montre la pièce (boutique, Vinted, ancienne page produit) et colle-le ici : nom, marque, prix, catégorie, couleur et photo sont remplis. Pièce plus en vente ? Copie juste son image et touche « Coller une image ».")}</p>
+    ${s.webImages ? `<div class="mono muted" style="margin:12px 0 6px">Choisis la photo (${s.webImages.length} sur la page)</div><div class="pick-strip">${s.webImages.map((u,k)=>`<button data-act="ed-pickimg" data-v="${k}" aria-pressed="${s.pickedImg===k}" aria-label="Photo ${k+1}">${s.pickBusy===k?'<span class="spinner"></span>':`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.hidden=true">`}</button>`).join("")}</div>` : ""}
     ${s.webPhoto ? `<div class="row" style="flex-wrap:nowrap;gap:12px;margin-top:12px"><div style="width:64px;flex:none">${thumb({photo:s.webPhoto})}</div><div class="row" style="flex:1">${it.photo===s.webPhoto ? `<span class="muted" style="font-size:13px">Photo trouvée utilisée.</span>${s.ownPhoto?`<button class="btn sm ghost" data-act="ed-ownphoto">Reprendre ma photo</button>`:""}` : `<button class="btn sm" data-act="ed-webphoto">Utiliser la photo du site</button>`}</div></div>` : ""}
   </div>`;
 }
@@ -2272,6 +2280,10 @@ document.addEventListener("click", async e => {
     case "bz-undo": s.rects.pop(); modal.paint(); break;
     case "ed-link": itemFromLink(s); break;
     case "ed-paste": pasteImage(s); break;
+    case "ed-pickimg": { readEditFields(s); const k = +v, use = s.item.photo===s.webPhoto; s.pickBusy = k; modal.paint();
+      const ph = await webPhoto(s.webImages[k]); if(modal.state!==s) break; s.pickBusy = null;
+      if(ph){ s.pickedImg = k; s.webPhoto = ph; if(use) s.item.photo = ph; } else toast("Cette photo n'est pas récupérable, choisis-en une autre.");
+      modal.paint(); break; }
     case "ed-lens": lensSearch(s); break;
     case "ed-webphoto": readEditFields(s); if(s.item.photo!==s.webPhoto) s.ownPhoto = s.item.photo; s.item.photo = s.webPhoto; modal.paint(); break;
     case "ed-ownphoto": readEditFields(s); s.item.photo = s.ownPhoto; modal.paint(); break;

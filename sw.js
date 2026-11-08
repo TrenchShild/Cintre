@@ -2,7 +2,7 @@
    - Page : réseau d'abord (pour recevoir les mises à jour), cache si hors ligne ou réseau trop lent.
    - Icônes, polices, SDK : cache d'abord, rafraîchi en arrière-plan.
    - Météo et API Claude : jamais mises en cache (toujours en direct). */
-const VERSION = "cintre-v8";
+const VERSION = "cintre-v9";
 const SHELL = ["./", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 const CACHED_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com", "cdn.jsdelivr.net"];
 
