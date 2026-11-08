@@ -19,6 +19,8 @@ Projet Supabase : `qogdwrfensailwsknnxc` (adresse et clé publique dans `CLOUD`,
    - « Allow new users to sign up » : activé.
    - « Confirm email » : désactivé. Les identifiants sont convertis en adresses techniques (`identifiant@users.cintre.invalid`) qui ne reçoivent pas d'e-mail.
 
+3. **Activer la recherche par photo** (Google Lens) : SQL Editor → New query → coller le contenu de `supabase/storage.sql` → Run. Ça crée l'espace de stockage `lens`, avec une photo par compte, remplacée à chaque recherche.
+
 ## Maintenance
 
 Après une modification, augmente `VERSION` dans `sw.js` pour que les téléphones où l'app est installée reçoivent la nouvelle version.

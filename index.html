@@ -1273,6 +1273,7 @@ async function wishFromLink(s){
     if(!it.name && title){ it.name = title.slice(0,80); got.push("nom"); }
     if(!it.brand && brand){ it.brand = String(brand).slice(0,40); got.push("marque"); }
     if((it.price==null || it.price==="") && price!=null){ it.price = price; got.push("prix"); }
+    const gw = guessFromText(`${title} ${prod?.color||""}`); if(gw.category){ it.category = gw.category; it.type = gw.type; got.push("catégorie"); } if(gw.colors && !(it.colors||[]).length){ it.colors = gw.colors; got.push("couleur"); }
     it.shop = String(d.publisher || u.hostname.replace(/^www\./, "")).slice(0,40);
     const img = [].concat(prod?.image || [])[0]; const imgUrl = (typeof img==="string" ? img : img?.url) || d.image?.url;
     if(imgUrl && !(s.crop && s.crop.src) && !(it.photo && !s.noPhoto)){
@@ -1442,9 +1443,18 @@ function autoMask(c, tol){
   const grow = (i, n) => { if(mask[n] && (dbg[n] < tol || (dbg[n] < tol*1.8 && dPix(lab, i, n) < tol*0.22))){ mask[n] = 0; q[t++] = n; } };
   while(h < t){ const i = q[h++], x = i % W;
     if(x > 0) grow(i, i-1); if(x < W-1) grow(i, i+1); if(i >= W) grow(i, i-W); if(i < N-W) grow(i, i+W); }
+  openMask(mask, W, H, Math.max(2, Math.round(Math.max(W, H)/300)));
   cleanMask(mask, W, H);
   return mask;
 }
+/* Ouverture morphologique : efface les bandes fines et les miettes de fond restées collées aux bords */
+function minMax(m, W, H, r, isMax){
+  const tmp = new Uint8Array(W*H), out = new Uint8Array(W*H);
+  for(let y = 0; y < H; y++){ const o = y*W; for(let x = 0; x < W; x++){ let v = isMax ? 0 : 1; for(let k = Math.max(0, x-r); k <= Math.min(W-1, x+r); k++){ const a = m[o+k]; if(isMax ? a : !a){ v = a; break; } } tmp[o+x] = v; } }
+  for(let x = 0; x < W; x++) for(let y = 0; y < H; y++){ let v = isMax ? 0 : 1; for(let k = Math.max(0, y-r); k <= Math.min(H-1, y+r); k++){ const a = tmp[k*W+x]; if(isMax ? a : !a){ v = a; break; } } out[y*W+x] = v; }
+  return out;
+}
+function openMask(m, W, H, r){ const o = minMax(minMax(m, W, H, r, false), W, H, r, true); for(let i = 0; i < m.length; i++) m[i] = m[i] && o[i]; }
 function featherAlpha(m, W, H){
   const a = new Uint8ClampedArray(W*H);
   for(let y = 0; y < H; y++) for(let x = 0; x < W; x++){
@@ -1609,6 +1619,143 @@ function localStylist(q){
   const p = picks[Math.floor(Math.random()*Math.min(3, picks.length))];
   const fresh = wx.data && wx.data.day===today() && !wx.manual;
   return `Pour ${OCCASIONS[J.occ].label.toLowerCase()}, ${fresh ? `${wx.data.min} à ${wx.data.max} °C` : `météo ${WEATHER[J.weather].label.toLowerCase()}`}${J.rain ? ", pluie" : ""} :\n` + p.pieces.map(i => `- ${B(i)} (${CATS[i.category].one.toLowerCase()})`).join("\n") + `\n\n${p.why.join(". ")}.`;
+}
+
+/* ---------- Retrouver une pièce en ligne : recherche par photo (Google Lens) + remplissage depuis un lien ---------- */
+/* Catégorie, type et couleurs déduits du nom d'un produit (français et anglais), sans IA */
+const TYPE_RULES = [
+  [/jogg|sweat ?pants?|survet|track ?pants?/, "bas", "Jogging"],
+  [/hoodie|capuche|hooded|zip ?hood/, "haut", "Hoodie"],
+  [/sweat-?shirt|sweat|crewneck|crew neck/, "haut", "Sweat"],
+  [/\bt-?shirt|\btee-?shirt|\btee\b/, "haut", "T-shirt"],
+  [/pull|cardigan|maille|knit|sweater|jumper|gilet/, "haut", "Pull"],
+  [/surchemise|overshirt|shacket/, "couche", "Surchemise"],
+  [/polo/, "haut", "Polo"],
+  [/chemise|shirt\b|oxford/, "haut", "Chemise"],
+  [/debardeur|tank|marcel/, "haut", "Débardeur"],
+  [/doudoune|puffer|down jacket|parka matelass/, "couche", "Doudoune"],
+  [/manteau|coat|trench|parka|caban/, "couche", "Manteau"],
+  [/blazer|veste de costume|veston/, "couche", "Blazer"],
+  [/blouson|bomber|teddy|harrington|perfecto/, "couche", "Blouson"],
+  [/veste|jacket|coach/, "couche", "Veste"],
+  [/jean|denim/, "bas", "Jean"],
+  [/chino/, "bas", "Chino"],
+  [/short|bermuda/, "bas", "Short"],
+  [/jupe|skirt/, "bas", "Jupe"],
+  [/pantalon|trousers?|pants?\b|cargo/, "bas", "Pantalon"],
+  [/combinaison|jumpsuit|salopette|overall/, "robe", "Combinaison"],
+  [/robe|dress/, "robe", "Robe"],
+  [/basket|sneaker|trainer|air force|air max|dunk|samba|gazelle|stan smith|chuck|new balance|\b550\b|vans|converse/, "chaussures", "Baskets"],
+  [/bottine|boots?\b|chelsea|rangers/, "chaussures", "Bottines"],
+  [/mocassin|loafer/, "chaussures", "Mocassins"],
+  [/sandale|sandal|claquette|mule/, "chaussures", "Sandales"],
+  [/escarpin|heels?\b|talons/, "chaussures", "Escarpins"],
+  [/casquette|\bcap\b|snapback/, "accessoire", "Casquette"],
+  [/bonnet|beanie/, "accessoire", "Bonnet"],
+  [/\bsac\b|\bbag\b|tote|cabas|banane/, "accessoire", "Sac"],
+  [/echarpe|scarf|foulard/, "accessoire", "Écharpe"],
+  [/ceinture|belt/, "accessoire", "Ceinture"]
+];
+const COLOR_RULES = [
+  [/bleu marine|navy|marine|dark blue/, "marine"], [/off-?white|ecru|creme|cream|ivoire|ivory/, "ecru"], [/noir|black/, "noir"], [/blanc|white/, "blanc"],
+  [/gris|grey|gray|anthracite|heather/, "gris"], [/indigo|denim|brut|raw/, "denim"], [/bleu|blue/, "bleu"], [/beige|sable|sand|stone|taupe/, "beige"],
+  [/camel|cognac/, "camel"], [/marron|brown|chocolat|chocolate|moka/, "marron"], [/kaki|khaki|olive/, "kaki"], [/vert|green/, "vert"],
+  [/bordeaux|burgundy|wine|lie de vin/, "bordeaux"], [/rouge|red\b/, "rouge"], [/rose|pink/, "rose"], [/jaune|yellow|moutarde|mustard/, "jaune"],
+  [/orange|rouille|rust/, "orange"], [/violet|purple|lilas|lavande|mauve/, "violet"]
+];
+const norm = x => String(x||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+function guessFromText(text){
+  const t = norm(text), out = {};
+  const r = TYPE_RULES.find(([re]) => re.test(t)); if(r){ out.category = r[1]; out.type = r[2]; }
+  const found = []; let rest = t;
+  for(const [re, c] of COLOR_RULES){ const m = rest.match(re); if(m){ found.push([m.index, c]); rest = rest.replace(new RegExp(re.source, "g"), x => " ".repeat(x.length)); } }
+  if(found.length) out.colors = found.sort((a,b) => a[0]-b[0]).map(x => x[1]).slice(0, 2);
+  return out;
+}
+/* Lecture d'une page produit via Microlink (données publiques : JSON-LD, balises meta) */
+async function fetchProduct(rawUrl){
+  let u; try{ u = new URL(/^https?:\/\//i.test(rawUrl) ? rawUrl : "https://" + rawUrl); if(!/\./.test(u.hostname)) throw 0; }catch{ throw {code:"bad_url"}; }
+  const api = new URL("https://api.microlink.io/");
+  api.searchParams.set("url", u.href);
+  api.searchParams.set("data.ld.selector", 'script[type="application/ld+json"]'); api.searchParams.set("data.ld.attr", "text"); api.searchParams.set("data.ld.type", "string");
+  api.searchParams.set("data.price.selector", 'meta[property="product:price:amount"],meta[property="og:price:amount"],[itemprop="price"]'); api.searchParams.set("data.price.attr", "content");
+  const r = await fetch(api, {headers:{Accept:"application/json"}}); const j = await r.json();
+  if(j.status !== "success") throw {code:"unreadable"};
+  const d = j.data || {};
+  let prod = null; try{ prod = findProduct(JSON.parse(d.ld || "null")); }catch{}
+  const brand = prod && (typeof prod.brand==="string" ? prod.brand : prod.brand?.name);
+  const offer = prod && [].concat(prod.offers||[])[0];
+  const img = [].concat(prod?.image || [])[0];
+  const name = String(prod?.name || d.title || "").split(/\s[|–—-]\s/)[0].trim().slice(0, 80);
+  return {url:u.href, name, brand: brand ? String(brand).slice(0,40) : "", price: parsePrice(offer?.price ?? offer?.lowPrice ?? d.price),
+    color: prod?.color ? String(prod.color) : "", image: (typeof img==="string" ? img : img?.url) || d.image?.url || "",
+    shop: String(d.publisher || u.hostname.replace(/^www\./, "")).slice(0,40), desc: String(prod?.description || d.description || "").slice(0, 300)};
+}
+/* Photo du site : copie locale si le site l'autorise, sinon adresse distante */
+async function webPhoto(url){
+  try{ const res = await fetch(url, {mode:"cors"}); if(!res.ok) throw 0; const b = await res.blob(); if(!/^image\//.test(b.type)) throw 0; const im = await fileToImage(b); return toDataURL(drawTo(im, 560)); }
+  catch{ try{ await loadImage(url); return url; }catch{ return ""; } }
+}
+async function itemFromLink(s){
+  readEditFields(s); const raw = (s.item.url||"").trim();
+  if(!raw){ s.linkMsg = "Colle d'abord l'adresse de la page produit."; modal.paint(); return; }
+  s.linkBusy = true; s.linkMsg = "Lecture de la page…"; modal.paint();
+  try{
+    const p = await fetchProduct(raw); if(modal.state!==s) return;
+    readEditFields(s); const it = s.item, got = [];
+    it.url = p.url;
+    if(p.name){ it.name = p.name; got.push("nom"); }
+    if(p.brand && !it.brand){ it.brand = p.brand; got.push("marque"); }
+    if(p.price!=null && (it.price==null || it.price==="")){ it.price = p.price; got.push("prix"); }
+    const g = guessFromText(`${p.name} ${p.color} ${p.desc}`), gn = guessFromText(`${p.name} ${p.color}`);
+    if(g.category && !s.catTouched){ it.category = gn.category || g.category; it.type = gn.type || g.type; got.push("catégorie"); }
+    if(gn.colors){ it.colors = gn.colors; got.push("couleur"); }
+    if(p.image){ s.linkMsg = "Récupération de la photo…"; modal.paint(); const ph = await webPhoto(p.image); if(modal.state!==s) return; if(ph){ s.webPhoto = ph; got.push("photo du site"); } }
+    s.linkMsg = got.length ? `Rempli : ${got.join(", ")}. Vérifie avant d'enregistrer.` : "Rien de lisible sur cette page. Remplis les champs à la main.";
+  }catch(e){ if(modal.state!==s) return; s.linkMsg = e?.code==="bad_url" ? "Ce lien n'est pas valide : colle l'adresse complète de la page produit." : "Impossible de lire cette page (site protégé ou limite du service atteinte). Remplis les champs à la main."; }
+  s.linkBusy = false; modal.paint();
+}
+function dataURLtoBlob(d){ const [h, b] = d.split(","), bin = atob(b), a = new Uint8Array(bin.length); for(let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Blob([a], {type:(h.match(/:(.*?);/)||[])[1] || "image/jpeg"}); }
+const lensUrl = img => "https://lens.google.com/uploadbyurl?url=" + encodeURIComponent(img);
+async function lensSearch(s){
+  readEditFields(s); const photo = s.item.photo;
+  if(!photo){ toast("Ajoute d'abord une photo de la pièce."); return; }
+  const after = "Dans Google Lens, ouvre le résultat qui correspond à ta pièce, copie l'adresse de la page, puis colle-la ci-dessus et touche « Remplir ».";
+  if(/^https?:/.test(photo)){ window.open(lensUrl(photo), "_blank", "noopener"); s.linkMsg = after; modal.paint(); return; }
+  const blob = dataURLtoBlob(photo);
+  if(store.mode==="cloud"){
+    const w = window.open("about:blank", "_blank");
+    s.lensBusy = true; s.linkMsg = "Envoi de la photo à Google Lens…"; modal.paint();
+    try{
+      const sb = await supa(), path = `${auth.user.id}/recherche.jpg`;
+      const {error} = await sb.storage.from("lens").upload(path, blob, {contentType:"image/jpeg", upsert:true, cacheControl:"60"});
+      if(error) throw error;
+      const target = lensUrl(sb.storage.from("lens").getPublicUrl(path).data.publicUrl + "?v=" + Date.now());
+      if(w && !w.closed) w.location.href = target; else s.lensLink = target;
+      s.linkMsg = after;
+    }catch(e){
+      if(w && !w.closed) w.close();
+      s.linkMsg = /bucket|not found|404/i.test(String(e?.message||e?.statusCode||"")) ? "La recherche par photo n'est pas encore activée sur ton Supabase : lance le script supabase/storage.sql (voir le README)." : isNetErr(e) ? "Pas de connexion à Internet." : "Envoi de la photo impossible (" + String(e?.message||"erreur").slice(0,80) + ").";
+    }
+    s.lensBusy = false; if(modal.state===s) modal.paint(); return;
+  }
+  const file = new File([blob], "piece.jpg", {type:"image/jpeg"});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file]}); s.linkMsg = "Choisis Google (ou Google Lens) dans le menu de partage. Ensuite, colle ici le lien du produit trouvé."; }catch{}
+    modal.paint(); return;
+  }
+  window.open("https://lens.google.com/", "_blank", "noopener");
+  s.linkMsg = "Sans compte, importe toi-même la photo dans Google Lens (icône appareil photo), puis colle ici le lien du produit."; modal.paint();
+}
+function findBlock(s){
+  const it = s.item, q = encodeURIComponent([it.brand, it.name].filter(Boolean).join(" ") || "vêtement");
+  return `<div class="panel" style="background:var(--sunk);box-shadow:none;padding:14px;margin-bottom:16px">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><b style="font-size:14px">Retrouver la pièce en ligne</b><span class="muted" style="font-size:12px">pré-remplit la fiche</span></div>
+    <div class="row" style="margin-bottom:10px">${it.photo?`<button class="btn sm primary" data-act="ed-lens" ${s.lensBusy?"disabled":""}>${s.lensBusy?'<span class="spinner"></span>':ICONS.camera}Rechercher la photo</button>`:""}<a class="btn sm" href="https://www.google.com/search?tbm=shop&q=${q}" target="_blank" rel="noopener">${ICONS.search}Chercher par le nom</a>${s.lensLink?`<a class="btn sm" href="${esc(s.lensLink)}" target="_blank" rel="noopener">Ouvrir Google Lens</a>`:""}</div>
+    <div class="row" style="flex-wrap:nowrap"><input class="input" id="ed-url" type="url" inputmode="url" autocapitalize="none" value="${esc(it.url||"")}" placeholder="Colle le lien de la page produit" style="flex:1;min-width:0;box-shadow:none"><button class="btn" data-act="ed-link" ${s.linkBusy?"disabled":""}>${s.linkBusy?'<span class="spinner"></span>':ICONS.spark}<span>Remplir</span></button></div>
+    <p class="muted" style="font-size:12px;margin:8px 0 0">${esc(s.linkMsg || "« Rechercher la photo » ouvre Google Lens sur ta photo. Copie le lien du produit trouvé, colle-le ici : nom, marque, prix, catégorie, couleur et photo du site sont remplis.")}</p>
+    ${s.webPhoto ? `<div class="row" style="flex-wrap:nowrap;gap:12px;margin-top:12px"><div style="width:64px;flex:none">${thumb({photo:s.webPhoto})}</div><div class="row" style="flex:1">${it.photo===s.webPhoto ? `<span class="muted" style="font-size:13px">Photo du site utilisée.</span>${s.ownPhoto?`<button class="btn sm ghost" data-act="ed-ownphoto">Reprendre ma photo</button>`:""}` : `<button class="btn sm" data-act="ed-webphoto">Utiliser la photo du site</button>`}</div></div>` : ""}
+  </div>`;
 }
 
 /* ---------- Navigation ---------- */
@@ -1840,7 +1987,8 @@ function render(){
 /* ---------- Modales ---------- */
 const modal = { render:null, state:{},
   open(fn, state={}){ this.render = fn; this.state = state; this.paint(); },
-  paint(){ const el=$("#modal"); if(!this.render){ el.innerHTML=""; return; }
+  paint(){ if(this.painting) return; this.painting = true; try{ this._paint(); } finally { this.painting = false; } },
+  _paint(){ const el=$("#modal"); if(!this.render){ el.innerHTML=""; return; }
     const keep = el.querySelector(".sheet")?.scrollTop || 0;
     const act = document.activeElement, aid = act && act.id && el.contains(act) && /^(INPUT|TEXTAREA)$/.test(act.tagName) ? act.id : null;
     let caret = null; try{ caret = aid ? act.selectionStart : null; }catch{}
@@ -1877,6 +2025,7 @@ function mEdit(s){
       <div style="flex:1;min-width:0">${s.busy?`<p class="row muted" style="margin:0"><span class="spinner"></span> Claude analyse la photo…</p>`:s.aiNote?`<p class="muted" style="margin:0;font-size:13px">${esc(s.aiNote)}</p>`:""}
         <div class="row" style="margin-top:8px">${it.photo&&!s.busy?`<button class="btn sm" data-act="ed-cut">Détourer</button>`:""}${it.photo&&store.ai&&store.aiImages&&!s.busy?`<button class="btn sm" data-act="ed-retag">${ICONS.spark}Relancer l'analyse</button>`:""}</div></div>
     </div>
+    ${findBlock(s)}
     <div class="field"><label for="ed-name">Nom</label><input class="input" id="ed-name" value="${esc(it.name)}" placeholder="Ex. Chemise Oxford bleue"></div>
     <div class="field"><label for="ed-brand">Marque</label><input class="input" id="ed-brand" value="${esc(it.brand)}"></div>
     <div class="two"><div class="field"><label for="ed-size">Taille</label><input class="input" id="ed-size" value="${esc(it.size)}" placeholder="M, 42…"></div>
@@ -1892,7 +2041,7 @@ function mEdit(s){
 }
 function readEditFields(s){
   const g = id => $("#"+id)?.value ?? "";
-  Object.assign(s.item, {name:g("ed-name").trim(), brand:g("ed-brand").trim(), size:g("ed-size").trim(), price:parsePrice(g("ed-price")), material:g("ed-mat").trim(), warmth:+g("ed-warm")||1, category:g("ed-cat")||s.item.category, type:g("ed-type")||s.item.type});
+  Object.assign(s.item, {url:(g("ed-url")||s.item.url||"").trim(), name:g("ed-name").trim(), brand:g("ed-brand").trim(), size:g("ed-size").trim(), price:parsePrice(g("ed-price")), material:g("ed-mat").trim(), warmth:+g("ed-warm")||1, category:g("ed-cat")||s.item.category, type:g("ed-type")||s.item.type});
 }
 function newItem(extra={}){ return {kind:"item", id:uid("item"), name:"", brand:"", size:"", category:"haut", type:"T-shirt", colors:[], seasons:[], styles:[], material:"", warmth:1, createdAt:new Date().toISOString(), ...extra}; }
 
@@ -1909,7 +2058,7 @@ function mItem(s){
       <dt>Tenues</dt><dd>${inOutfits.length?inOutfits.map(o=>esc(o.name)).join(", "):"aucune"}</dd></dl></div>
     ${s.confirm?`<div class="confirm" style="margin-top:14px"><b>Supprimer « ${esc(i.name)} » ?</b><span class="muted" style="font-size:13px">Elle sera aussi retirée de ${inOutfits.length} tenue(s). Action définitive.</span><div class="row"><button class="btn sm" data-act="it-cancel">Garder</button><button class="btn sm danger" data-act="it-del-yes" data-id="${i.id}">Supprimer</button></div></div>`:""}
     <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn ghost danger" data-act="it-del" data-id="${i.id}">Supprimer</button>
-      <div class="row">${i.photo?`<button class="btn" data-act="it-cut" data-id="${i.id}">Détourer</button>`:""}<button class="btn" data-act="it-wear" data-id="${i.id}">Portée aujourd'hui</button><button class="btn primary" data-act="it-edit" data-id="${i.id}">Modifier</button></div></div>`;
+      <div class="row">${i.url?`<a class="btn" href="${esc(i.url)}" target="_blank" rel="noopener">Voir en ligne</a>`:""}${i.photo&&!/^https?:/.test(i.photo)?`<button class="btn" data-act="it-cut" data-id="${i.id}">Détourer</button>`:""}<button class="btn" data-act="it-wear" data-id="${i.id}">Portée aujourd'hui</button><button class="btn primary" data-act="it-edit" data-id="${i.id}">Modifier</button></div></div>`;
 }
 
 function mLibrary(s){
@@ -2096,11 +2245,15 @@ document.addEventListener("click", async e => {
     case "cut-reset": if(s.c){ s.undo.push(s.mask.slice()); s.tol = 14; s.mask = autoMask(s.c, 14); modal.paint(); } break;
     case "cut-ok": { if(s.busy) break; const photo = cutExport(s.c, s.mask); if(!photo){ toast("La pièce a été presque entièrement effacée : restaure-la ou réinitialise."); break; } s.done({photo, colors:colorsFrom(s.c, s.mask)}); break; }
     case "cut-skip": s.done({photo:toDataURL(drawTo(s.im, 560)), colors:s.c ? colorsFrom(s.c, null) : []}); break;
-    case "ed-cut": { readEditFields(s); const back = s; const im = await loadImage(s.item.photo).catch(()=>null); if(!im) break;
+    case "ed-cut": { readEditFields(s); if(/^https?:/.test(s.item.photo||"")){ toast("La photo du site est déjà prête : pas besoin de la détourer."); break; } const back = s; const im = await loadImage(s.item.photo).catch(()=>null); if(!im) break;
       openCut(im, r => { back.item.photo = r.photo; if(!(back.item.colors||[]).length) back.item.colors = r.colors; modal.open(mEdit, back); }); break; }
     case "it-cut": { const i = DB.items.get(id); const im = await loadImage(i.photo).catch(()=>null); if(!im) break;
       openCut(im, async r => { modal.close(); await put({...DB.items.get(id), photo:r.photo}); toast("Photo détourée."); }); break; }
     case "bz-undo": s.rects.pop(); modal.paint(); break;
+    case "ed-link": itemFromLink(s); break;
+    case "ed-lens": lensSearch(s); break;
+    case "ed-webphoto": readEditFields(s); if(s.item.photo!==s.webPhoto) s.ownPhoto = s.item.photo; s.item.photo = s.webPhoto; modal.paint(); break;
+    case "ed-ownphoto": readEditFields(s); s.item.photo = s.ownPhoto; modal.paint(); break;
     case "bz-next": batchCutNext(s); break;
     case "wish-new": modal.open(mWish, {wish:true, isNew:true, item:newWish()}); break;
     case "wish-edit": { const w = DB.wish.get(id); if(w) modal.open(mWish, {wish:true, isNew:false, item:JSON.parse(JSON.stringify(w))}); break; }
@@ -2212,7 +2365,9 @@ document.addEventListener("change", e => {
   else if(t.id==="j-rain"){ wx.manual = !!wx.data; ui.jour.rain = t.checked; ui.jour.picks = null; ui.jour.idx=0; render(); }
   else if(t.id==="wi-cat"){ readWishFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
   else if(t.id==="o-withwish"){ s.name = $("#o-name")?.value; s.withWish = t.checked; if(!t.checked) for(const k of Object.keys(s.sel)) if(DB.wish.has(s.sel[k])) s.sel[k] = null; modal.paint(); }
-  else if(t.id==="ed-cat"){ readEditFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
+  else if(t.id==="ed-name" && s.item && !s.catTouched && !(store.ai && store.aiImages)){ readEditFields(s); const g = guessFromText(s.item.name); if(g.category){ s.item.category = g.category; s.item.type = g.type; } if(g.colors && !(s.item.colors||[]).length) s.item.colors = g.colors; if(g.category || g.colors) modal.paint(); }
+  else if(t.id==="ed-type"){ s.catTouched = true; }
+  else if(t.id==="ed-cat"){ s.catTouched = true; readEditFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
   else if(t.dataset.act==="b-tog"){ s.found[+t.dataset.v].keep = t.checked; modal.paint(); }
   else if(t.dataset.act==="b-cat"){ const f = s.found[+t.dataset.v]; f.category = t.value; f.type = CATS[t.value].types[0]; modal.paint(); }
   else if(t.dataset.act==="b-type"){ s.found[+t.dataset.v].type = t.value; }
