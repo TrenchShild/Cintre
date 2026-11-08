@@ -359,6 +359,16 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @media (min-width:600px){.prompts{grid-template-columns:1fr 1fr}}
 .prompt{border:0;background:var(--sunk);border-radius:var(--r-sm);padding:13px 15px;text-align:left;font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:8px}
 .prompt span:last-child{color:var(--accent)}
+/* ---------- Détourage et découpe ---------- */
+.cut-wrap{position:relative;border-radius:var(--r-sm);overflow:hidden;display:grid;place-items:center;min-height:160px;background:#fff conic-gradient(#e9e9e5 25%,#fff 0 50%,#e9e9e5 0 75%,#fff 0) 0 0/18px 18px}
+.cut-cv{display:block;max-width:100%;max-height:42vh;width:auto;height:auto;touch-action:none;cursor:crosshair}
+.cut-busy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.55);color:#0B0B0F}
+.bz{position:relative;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:var(--r-sm);overflow:hidden;cursor:crosshair;background:var(--sunk)}
+.bz img{display:block;width:100%;height:auto;max-height:60vh;object-fit:contain;pointer-events:none}
+.bz-r{position:absolute;border:2.5px solid var(--accent);background:rgba(79,70,229,.14);border-radius:6px;pointer-events:none}
+.bz-r span{position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font:700 11px/1 var(--f-body);padding:3px 7px;border-radius:999px}
+.bz-r.tmp{border-style:dashed}
+.scan-row select{padding:6px 8px;font-size:13px;box-shadow:none;background:var(--sunk);width:auto;max-width:100%}
 </style>
 
 <div id="gate" class="gate" hidden></div>
@@ -1142,8 +1152,12 @@ function styleContext(){
   return `Date : ${fmtDate(today())}. Météo : ${meteo}.\n\nGarde-robe (${items().length} pièces) :\n${its||"(vide)"}\n\nWishlist :\n${wish||"(vide)"}\n\nTenues enregistrées :\n${outs||"(aucune)"}\n\nPorté ces 7 derniers jours :\n${recent||"(rien de noté)"}`;
 }
 async function askStylist(q){
-  q = String(q||"").trim(); if(!q || !store.ai || chat.busy) return;
+  q = String(q||"").trim(); if(!q || chat.busy) return;
   const list = chatList(); list.push({role:"user", text:q});
+  if(!store.ai){
+    let text; try{ text = localStylist(q); }catch{ text = "Je n'ai pas réussi à calculer de réponse. Essaie une autre question."; }
+    list.push({role:"ai", text}); chat.draft = ""; LS.set(chatKey(), list.slice(-40)); render(); scrollChat(); return;
+  }
   const ans = {role:"ai", text:""}; list.push(ans);
   chat.busy = true; chat.draft = ""; render(); scrollChat();
   const hist = list.slice(-10, -2).map(m => `${m.role==="user"?"Utilisateur":"Styliste"} : ${m.text}`).join("\n\n");
@@ -1352,14 +1366,249 @@ function viewAccueil(){
 function viewStyliste(){
   const list = chatList();
   const head = `${brandMobile()}<div class="head"><div><div class="eyebrow">Ton conseiller de style</div><h1 style="margin-top:10px">Ton <span class="s">styliste</span></h1><p>Des idées pensées à partir de ton dressing, de la météo et de tes envies.</p></div>${list.length?`<button class="btn sm ghost" data-act="chat-clear" ${chat.busy?"disabled":""}>Nouvelle conversation</button>`:""}</div>`;
-  if(!store.ai) return head + `<div class="panel empty"><h2>Active Claude</h2><p>${STANDALONE ? "Le styliste s'appuie sur Claude. Ajoute ta clé API dans les réglages pour lui parler." : "Le styliste a besoin de l'accès à Claude."}</p>${STANDALONE?`<button class="btn primary" data-act="settings">Ouvrir les réglages</button>`:""}</div>`;
   const intro = `<div class="panel stack">
-      <div class="row" style="flex-wrap:nowrap;gap:12px;align-items:flex-start"><span class="avatar" style="background:var(--accent);color:var(--accent-ink)">${ICONS.spark}</span><div><b>Salut${auth.user ? `, ${esc(auth.user.name)}` : ""} !</b><div class="muted" style="font-size:14px">Je connais tes ${items().length} pièces, tes tenues, tes envies et la météo du jour. Demande-moi une tenue, une association ou un conseil d'achat.</div></div></div>
+      <div class="row" style="flex-wrap:nowrap;gap:12px;align-items:flex-start"><span class="avatar" style="background:var(--accent);color:var(--accent-ink)">${ICONS.spark}</span><div><b>Salut${auth.user ? `, ${esc(auth.user.name)}` : ""} !</b><div class="muted" style="font-size:14px">${store.ai ? `Je connais tes ${items().length} pièces, tes tenues, tes envies et la météo du jour. Demande-moi une tenue, une association ou un conseil d'achat.` : `Je calcule mes réponses à partir de tes ${items().length} pièces, de la météo, des accords de couleurs et de ce que tu portes. Demande-moi une tenue (pour une occasion), ce qui va avec une pièce, ce qu'il te manque ou ce que vaut ta wishlist.`}</div></div></div>${!store.ai && STANDALONE ? `<p class="muted" style="margin:0;font-size:12px">Mode sans IA. Avec une clé Claude (Réglages), tu peux poser n'importe quelle question.</p>` : ""}
       <div class="prompts">${PROMPTS.map(([l],k)=>`<button class="prompt" data-act="chat-p" data-v="${k}" ${chat.busy?"disabled":""}><span>${l}</span><span aria-hidden="true">↗</span></button>`).join("")}</div></div>`;
   const msgs = list.map((m,k) => m.role==="user" ? `<div class="msg me">${esc(m.text)}</div>`
     : `<div class="msg ai ${m.err?"err":""}" ${k===list.length-1?'id="chat-last"':""}>${m.text ? md(m.text) : '<span class="spinner"></span>'}</div>`).join("");
   return head + (list.length ? `<div class="chat">${msgs}</div>` : intro)
     + `<form class="composer" data-form="chat"><textarea id="chat-q" rows="1" placeholder="Pose ta question à ton styliste…" aria-label="Ta question" enterkeyhint="send">${esc(chat.draft)}</textarea><button class="btn primary" type="submit" aria-label="Envoyer" ${chat.busy?"disabled":""}>${ICONS.send}</button></form>`;
+}
+
+/* ---------- Détourage sans IA : remplissage depuis les bords de la photo + retouche au doigt ----------
+   1. On repère les couleurs du fond sur les bords de la photo (regroupement en 3 teintes au plus).
+   2. On « remplit » le fond depuis les bords, de proche en proche, tant que la couleur reste proche du fond
+      (en tolérant les dégradés et les ombres douces).
+   3. On garde les grandes zones restantes (la pièce), on adoucit le contour, on recadre sur la pièce.
+   Tout se passe dans le navigateur : rien n'est envoyé nulle part. */
+const SRGB_LUT = new Float32Array(256).map((_, c) => { c /= 255; return c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); });
+function labInto(r, g, b, out, j){
+  const R = SRGB_LUT[r], G = SRGB_LUT[g], B = SRGB_LUT[b];
+  let x = (R*0.4124 + G*0.3576 + B*0.1805)/0.95047, y = R*0.2126 + G*0.7152 + B*0.0722, z = (R*0.0193 + G*0.1192 + B*0.9505)/1.08883;
+  x = x > 0.008856 ? Math.cbrt(x) : 7.787*x + 16/116; y = y > 0.008856 ? Math.cbrt(y) : 7.787*y + 16/116; z = z > 0.008856 ? Math.cbrt(z) : 7.787*z + 16/116;
+  out[j] = 116*y - 16; out[j+1] = 500*(x - y); out[j+2] = 200*(y - z);
+}
+const PALETTE_LAB = Object.entries(COLORS).map(([k, hex]) => { const n = parseInt(hex.slice(1), 16), o = [0,0,0]; labInto(n>>16&255, n>>8&255, n&255, o, 0); return [k, o]; });
+/* Distance « fond » : la luminosité compte moins, pour tolérer ombres et plis */
+const dBg = (lab, j, b) => { const dl = 0.6*(lab[j]-b[0]), da = lab[j+1]-b[1], db = lab[j+2]-b[2]; return Math.sqrt(dl*dl + da*da + db*db); };
+const dPix = (lab, i, n) => { const a = i*3, b = n*3, dl = 0.6*(lab[a]-lab[b]), da = lab[a+1]-lab[b+1], db = lab[a+2]-lab[b+2]; return Math.sqrt(dl*dl + da*da + db*db); };
+
+function cutPrepare(im, box){
+  const cv = drawTo(im, 900, box), W = cv.width, H = cv.height;
+  const data = cv.getContext("2d").getImageData(0, 0, W, H).data;
+  const lab = new Float32Array(W*H*3);
+  for(let i = 0, j = 0; i < data.length; i += 4, j += 3) labInto(data[i], data[i+1], data[i+2], lab, j);
+  return {W, H, data, lab};
+}
+function borderColors(c){
+  const {W, H, lab} = c, pts = [], step = Math.max(1, Math.round((W + H)/500));
+  const push = (x, y) => { const j = (y*W + x)*3; pts.push([lab[j], lab[j+1], lab[j+2]]); };
+  for(let x = 0; x < W; x += step){ push(x, 0); push(x, 2); push(x, H-1); push(x, H-3); }
+  for(let y = 0; y < H; y += step){ push(0, y); push(2, y); push(W-1, y); push(W-3, y); }
+  let cs = [0, 1/3, 2/3].map(f => pts[Math.floor(f*pts.length)].slice());
+  const d = (p, q) => { const dl = 0.6*(p[0]-q[0]), da = p[1]-q[1], db = p[2]-q[2]; return dl*dl + da*da + db*db; };
+  let counts = [0,0,0];
+  for(let it = 0; it < 10; it++){
+    const sum = cs.map(() => [0,0,0]); counts = [0,0,0];
+    for(const p of pts){ let bi = 0, bd = Infinity; for(let k = 0; k < cs.length; k++){ const v = d(p, cs[k]); if(v < bd){ bd = v; bi = k; } } sum[bi][0] += p[0]; sum[bi][1] += p[1]; sum[bi][2] += p[2]; counts[bi]++; }
+    cs = cs.map((c0, k) => counts[k] ? sum[k].map(v => v/counts[k]) : c0);
+  }
+  return cs.filter((_, k) => counts[k] >= pts.length*0.08);
+}
+function cleanMask(m, W, H){
+  const N = W*H, lab = new Int32Array(N).fill(-1), q = new Int32Array(N), sizes = [];
+  for(let i = 0; i < N; i++){
+    if(!m[i] || lab[i] >= 0) continue;
+    const id = sizes.length; let h = 0, t = 0; q[t++] = i; lab[i] = id;
+    while(h < t){ const p = q[h++], x = p % W;
+      if(x > 0 && m[p-1] && lab[p-1] < 0){ lab[p-1] = id; q[t++] = p-1; }
+      if(x < W-1 && m[p+1] && lab[p+1] < 0){ lab[p+1] = id; q[t++] = p+1; }
+      if(p >= W && m[p-W] && lab[p-W] < 0){ lab[p-W] = id; q[t++] = p-W; }
+      if(p < N-W && m[p+W] && lab[p+W] < 0){ lab[p+W] = id; q[t++] = p+W; } }
+    sizes.push(t);
+  }
+  if(!sizes.length) return;
+  const max = sizes.reduce((a, b) => Math.max(a, b), 0), keep = Math.max(max*0.12, N*0.002);
+  for(let i = 0; i < N; i++) if(m[i] && sizes[lab[i]] < keep) m[i] = 0;
+}
+function autoMask(c, tol){
+  const {W, H, lab} = c, N = W*H;
+  if(!c.bg) c.bg = borderColors(c);
+  if(!c.dbg){ c.dbg = new Float32Array(N); for(let i = 0; i < N; i++){ let m = Infinity; for(const b of c.bg){ const v = dBg(lab, i*3, b); if(v < m) m = v; } c.dbg[i] = m; } }
+  const dbg = c.dbg, mask = new Uint8Array(N).fill(1), q = new Int32Array(N); let h = 0, t = 0;
+  const seed = i => { if(mask[i] && dbg[i] < tol){ mask[i] = 0; q[t++] = i; } };
+  for(let x = 0; x < W; x++){ seed(x); seed((H-1)*W + x); }
+  for(let y = 0; y < H; y++){ seed(y*W); seed(y*W + W - 1); }
+  const grow = (i, n) => { if(mask[n] && (dbg[n] < tol || (dbg[n] < tol*1.8 && dPix(lab, i, n) < tol*0.22))){ mask[n] = 0; q[t++] = n; } };
+  while(h < t){ const i = q[h++], x = i % W;
+    if(x > 0) grow(i, i-1); if(x < W-1) grow(i, i+1); if(i >= W) grow(i, i-W); if(i < N-W) grow(i, i+W); }
+  cleanMask(mask, W, H);
+  return mask;
+}
+function featherAlpha(m, W, H){
+  const a = new Uint8ClampedArray(W*H);
+  for(let y = 0; y < H; y++) for(let x = 0; x < W; x++){
+    let s = 0, n = 0;
+    for(let dy = -1; dy <= 1; dy++){ const yy = y + dy; if(yy < 0 || yy >= H) continue; for(let dx = -1; dx <= 1; dx++){ const xx = x + dx; if(xx < 0 || xx >= W) continue; s += m[yy*W + xx]; n++; } }
+    a[y*W + x] = s*255/n;
+  }
+  return a;
+}
+function cutExport(c, mask){
+  const {W, H, data} = c, a = featherAlpha(mask, W, H);
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for(let y = 0; y < H; y++) for(let x = 0; x < W; x++) if(a[y*W + x] > 40){ if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+  if(x1 < 0 || (x1-x0)*(y1-y0) < W*H*0.004) return null;
+  const pad = Math.round(Math.max(x1-x0, y1-y0)*0.06);
+  x0 = Math.max(0, x0-pad); y0 = Math.max(0, y0-pad); x1 = Math.min(W-1, x1+pad); y1 = Math.min(H-1, y1+pad);
+  const tmp = document.createElement("canvas"); tmp.width = W; tmp.height = H;
+  const tc = tmp.getContext("2d"), id = tc.createImageData(W, H); id.data.set(data);
+  for(let i = 0; i < a.length; i++) id.data[i*4 + 3] = a[i];
+  tc.putImageData(id, 0, 0);
+  const w = x1-x0+1, h = y1-y0+1, k = Math.min(1, 560/Math.max(w, h));
+  const out = document.createElement("canvas"); out.width = Math.max(1, Math.round(w*k)); out.height = Math.max(1, Math.round(h*k));
+  const o = out.getContext("2d"); o.fillStyle = "#fff"; o.fillRect(0, 0, out.width, out.height);
+  o.drawImage(tmp, x0, y0, w, h, 0, 0, out.width, out.height);
+  return out.toDataURL("image/jpeg", .86);
+}
+/* Couleurs dominantes de la pièce (pixels gardés, loin du contour), ramenées à la palette de l'app */
+function colorsFrom(c, mask){
+  const {W, H, lab} = c, count = {}; let total = 0;
+  const inside = (x, y) => { if(!mask) return x > W*0.2 && x < W*0.8 && y > H*0.2 && y < H*0.8; const i = y*W + x; return mask[i] && mask[i-2] && mask[i+2] && mask[i-2*W] && mask[i+2*W]; };
+  for(let y = 2; y < H-2; y += 2) for(let x = 2; x < W-2; x += 2){
+    if(!inside(x, y)) continue;
+    const j = (y*W + x)*3; let best = null, bd = Infinity;
+    for(const [k, p] of PALETTE_LAB){ const dl = lab[j]-p[0], da = lab[j+1]-p[1], db = lab[j+2]-p[2], v = dl*dl + da*da + db*db; if(v < bd){ bd = v; best = k; } }
+    count[best] = (count[best]||0) + 1; total++;
+  }
+  if(!total) return [];
+  const ranked = Object.entries(count).sort((a, b) => b[1]-a[1]);
+  const out = ranked.filter(([, n]) => n/total >= 0.18).slice(0, 2).map(([k]) => k);
+  return out.length ? out : [ranked[0][0]];
+}
+
+function mCut(s){
+  return sheetHead("Détourage") + `
+    <p class="muted" style="margin:-8px 0 12px;font-size:13px">Le fond est retiré automatiquement, directement sur ton appareil. Ça marche le mieux avec la pièce posée à plat ou suspendue devant un fond uni (lit, sol, mur). Retouche au doigt si besoin.</p>
+    <div class="cut-wrap"><canvas id="cut-cv" class="cut-cv" aria-label="Aperçu du détourage. Glisse le doigt pour effacer ou restaurer."></canvas>${s.busy ? '<div class="cut-busy"><span class="spinner"></span></div>' : ""}</div>
+    <div class="field" style="margin:14px 0 10px"><label for="cut-tol" class="row" style="justify-content:space-between">Fond retiré <span class="mono" id="cut-tol-v">${s.tol < 10 ? "peu" : s.tol < 20 ? "normal" : "beaucoup"}</span></label><input type="range" id="cut-tol" min="4" max="36" step="1" value="${s.tol}"></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <div class="seg" role="group" aria-label="Pinceau"><button data-act="cut-mode" data-v="erase" aria-pressed="${s.mode==="erase"}">Effacer</button><button data-act="cut-mode" data-v="keep" aria-pressed="${s.mode==="keep"}">Restaurer</button></div>
+      <label class="row" style="font-size:13px;gap:6px;flex-wrap:nowrap">Pinceau <input type="range" id="cut-brush" min="1" max="10" value="${s.brush}" style="width:90px"></label></div>
+    <div class="row" style="margin-bottom:16px"><button class="btn sm" data-act="cut-undo">Annuler la retouche</button><button class="btn sm ghost" data-act="cut-reset">Réinitialiser</button></div>
+    <div class="row" style="justify-content:space-between"><button class="btn ghost" data-act="cut-skip">Garder l'original</button><button class="btn primary" data-act="cut-ok" ${s.busy?"disabled":""}>Valider</button></div>`;
+}
+function cutDraw(fast){
+  const s = modal.state, cv = $("#cut-cv"); if(!cv || !s || !s.c) return;
+  const {W, H, data} = s.c;
+  if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; }
+  const ctx = cv.getContext("2d"), img = ctx.createImageData(W, H); img.data.set(data);
+  const a = fast ? null : featherAlpha(s.mask, W, H);
+  for(let i = 0, n = W*H; i < n; i++) img.data[i*4 + 3] = a ? a[i] : s.mask[i]*255;
+  ctx.putImageData(img, 0, 0);
+}
+async function openCut(im, done){
+  const s = {busy:true, tol:14, mode:"erase", brush:4, undo:[], done, im};
+  modal.open(mCut, s);
+  await new Promise(r => setTimeout(r, 40));
+  s.c = cutPrepare(im); s.mask = autoMask(s.c, s.tol); s.busy = false;
+  if(modal.state === s) modal.paint();
+}
+let cutStroke = null, cutRaf = 0, bzDrag = null;
+function brushAt(e){
+  const s = modal.state, c = s.c, r = cutStroke.getBoundingClientRect();
+  const x = (e.clientX - r.left)/r.width*c.W, y = (e.clientY - r.top)/r.height*c.H, rad = s.brush/100*Math.max(c.W, c.H), val = s.mode==="erase" ? 0 : 1;
+  for(let yy = Math.max(0, Math.floor(y-rad)); yy <= Math.min(c.H-1, Math.ceil(y+rad)); yy++)
+    for(let xx = Math.max(0, Math.floor(x-rad)); xx <= Math.min(c.W-1, Math.ceil(x+rad)); xx++)
+      if((xx-x)*(xx-x) + (yy-y)*(yy-y) <= rad*rad) s.mask[yy*c.W + xx] = val;
+  if(!cutRaf) cutRaf = requestAnimationFrame(() => { cutRaf = 0; cutDraw(true); });
+}
+document.addEventListener("pointerdown", e => {
+  const s = modal.state; if(!s || !e.target.closest) return;
+  const cv = e.target.closest("#cut-cv");
+  if(cv && s.mask && !s.busy){ s.undo.push(s.mask.slice()); if(s.undo.length > 15) s.undo.shift(); cutStroke = cv; try{ cv.setPointerCapture(e.pointerId); }catch{} brushAt(e); e.preventDefault(); return; }
+  const bz = e.target.closest("#bz");
+  if(bz && s.rects && !s.busy){ const r = bz.getBoundingClientRect(); bzDrag = {el:bz, r, x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height}; try{ bz.setPointerCapture(e.pointerId); }catch{} e.preventDefault(); }
+});
+const clamp01 = v => Math.max(0, Math.min(1, v));
+function bzRect(e){ const {r, x, y} = bzDrag, x2 = clamp01((e.clientX-r.left)/r.width), y2 = clamp01((e.clientY-r.top)/r.height); return [Math.min(x, x2), Math.min(y, y2), Math.max(x, x2), Math.max(y, y2)]; }
+document.addEventListener("pointermove", e => {
+  if(cutStroke) brushAt(e);
+  else if(bzDrag){ const b = bzRect(e), t = $("#bz-tmp"); if(t){ t.hidden = false; t.style.cssText = `left:${b[0]*100}%;top:${b[1]*100}%;width:${(b[2]-b[0])*100}%;height:${(b[3]-b[1])*100}%`; } }
+});
+const endTool = e => {
+  if(cutStroke){ cutStroke = null; cutDraw(); }
+  if(bzDrag){ const b = bzRect(e); bzDrag = null; if(b[2]-b[0] > 0.04 && b[3]-b[1] > 0.04) modal.state.rects.push(b); modal.paint(); }
+};
+document.addEventListener("pointerup", endTool); document.addEventListener("pointercancel", endTool);
+
+/* Scan en lot sans IA : on entoure chaque vêtement, puis chacun est détouré automatiquement */
+function mBatchCut(s){
+  return sheetHead("Entoure tes pièces") + `<p class="muted" style="margin:-8px 0 12px;font-size:13px">Trace un rectangle autour de chaque vêtement avec le doigt. Le fond de chaque pièce sera retiré automatiquement ; tu choisiras ensuite la catégorie.</p>
+    <div class="bz" id="bz"><img src="${s.src}" alt="Photo à découper" draggable="false">${s.rects.map((r,k) => `<div class="bz-r" style="left:${r[0]*100}%;top:${r[1]*100}%;width:${(r[2]-r[0])*100}%;height:${(r[3]-r[1])*100}%"><span>${k+1}</span></div>`).join("")}<div class="bz-r tmp" id="bz-tmp" hidden></div></div>
+    <div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn sm" data-act="bz-undo" ${s.rects.length?"":"disabled"}>Retirer le dernier</button><span class="mono">${s.rects.length} pièce${s.rects.length>1?"s":""}</span></div>
+    ${s.busy ? `<p class="row muted" style="margin:12px 0 0"><span class="spinner"></span> Détourage des pièces…</p>` : ""}
+    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-act="close">Annuler</button><button class="btn primary" data-act="bz-next" ${s.rects.length && !s.busy ? "" : "disabled"}>Continuer</button></div>`;
+}
+async function onBatchManual(file){
+  const im = await fileToImage(file).catch(() => null); if(!im){ toast("Image illisible."); return; }
+  modal.open(mBatchCut, {im, src:toDataURL(drawTo(im, 1400)), rects:[]});
+}
+async function batchCutNext(s){
+  s.busy = true; modal.paint(); const found = [];
+  for(const r of s.rects){
+    await new Promise(res => setTimeout(res, 0));
+    const c = cutPrepare(s.im, r), mask = autoMask(c, 14);
+    const photo = cutExport(c, mask) || toDataURL(drawTo(s.im, 560, r));
+    found.push({...newItem({photo, colors:colorsFrom(c, mask)}), keep:true, manual:true});
+  }
+  if(modal.state !== s) return;
+  modal.open(mBatch, {found, manual:true});
+}
+
+/* ---------- Styliste sans IA : réponses calculées par règles ---------- */
+function localStylist(q){
+  const n = x => String(x||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const t = n(q), its = items();
+  if(!its.length) return "Ta garde-robe est vide pour l'instant. Ajoute quelques pièces (Dressing → Ajouter) et je pourrai te proposer des tenues.";
+  const B = i => `**${i.name}**`;
+  const fit = s => s >= .85 ? "accord harmonieux" : s >= .5 ? "à oser" : "risqué";
+  const occ = Object.entries(OCCASIONS).find(([k, v]) => t.includes(n(v.label)) || t.includes(k))?.[0] || (/soir|fete|diner|resto/.test(t) ? "soiree" : /bureau|boulot|travail|entretien/.test(t) ? "travail" : /sport|salle|courir/.test(t) ? "sport" : null);
+  const piece = its.find(i => i.name.length > 3 && t.includes(n(i.name))) || its.find(i => i.type && t.includes(n(i.type)) && t.includes(n(COLOR_LABEL[(i.colors||[])[0]]||"~")));
+  const combosWith = id => baseCombos().filter(c => c.some(x => x.id===id)).map(c => ({c, s:colorScore(c)})).sort((a,b) => b.s-a.s);
+  if(piece){
+    const list = combosWith(piece.id).slice(0, 3);
+    if(!list.length) return `Je ne trouve pas encore de combinaison complète avec ${B(piece)} : il manque une pièce d'une autre catégorie (haut, bas ou chaussures).`;
+    return `Avec ${B(piece)}, voici ce qui marche le mieux :\n` + list.map(({c,s}) => `- ${c.filter(x => x.id!==piece.id).map(B).join(" + ")} (${fit(s)})`).join("\n");
+  }
+  if(/wishlist|envie/.test(t)){
+    const w = [...DB.wish.values()].map(x => ({w:x, v:addedValue(x)})).sort((a,b) => b.v.n-a.v.n);
+    if(!w.length) return "Ta wishlist est vide. Ajoute une pièce dans l'onglet Envies et je te dirai avec combien de tes tenues elle irait.";
+    const top = w[0]; let ex = "";
+    if(["haut","bas","robe","chaussures"].includes(top.w.category)){
+      const c = baseCombos([...items(), {...top.w, id:"__w"}]).filter(c => c.some(x => x.id==="__w")).map(c => ({c, s:colorScore(c)})).sort((a,b) => b.s-a.s)[0];
+      if(c) ex = `\nPar exemple : ${c.c.filter(x => x.id!=="__w").map(B).join(" + ")}.`;
+    }
+    return `La pièce qui vaut le plus le coup : ${B(top.w)}, elle irait avec ${top.v.n} ${top.v.unit}.${ex}` + (w.length > 1 ? `\n\nTes autres envies :\n` + w.slice(1, 5).map(({w, v}) => `- ${B(w)} : ${v.n ? `${v.n} ${v.unit}` : "s'accorde avec peu de choses"}`).join("\n") : "");
+  }
+  if(/manque|acheter|achat|complet|investir/.test(t)){
+    const owned = new Set(its.map(i => i.catalogId).filter(Boolean));
+    const recs = CATALOG.filter(c => !owned.has(c.id) && c.category!=="accessoire").map(c => ({c, v:addedValue(c)})).filter(r => r.v.n > 0).sort((a,b) => b.v.n-a.v.n).slice(0, 3);
+    if(!recs.length) return "Ta garde-robe est déjà bien équilibrée : aucune pièce de la bibliothèque n'ajouterait beaucoup de nouvelles tenues.";
+    return "Les pièces qui débloqueraient le plus de nouvelles tenues :\n" + recs.map(({c, v}) => `- **${c.name}**${c.brand && c.brand!=="Générique" ? ` (${c.brand})` : ""} : +${v.n} ${v.unit}`).join("\n") + "\n\nAvant d'acheter, regarde aussi en seconde main (bouton dans Envies).";
+  }
+  if(/associ|ensemble|va bien|vont bien|marier|pas assez|oubli|jamais/.test(t)){
+    const ws = wearStats();
+    const rare = its.filter(i => ["haut","bas","robe","chaussures"].includes(i.category)).sort((a,b) => (ws[a.id]?.count||0)-(ws[b.id]?.count||0)).slice(0, 6);
+    const lines = [];
+    for(const i of rare){ const c = combosWith(i.id)[0]; if(c && c.s >= .85) lines.push(`- ${B(i)} (${ws[i.id] ? `porté ${ws[i.id].count} fois` : "jamais porté"}) : avec ${c.c.filter(x => x.id!==i.id).map(B).join(" + ")}`); if(lines.length >= 3) break; }
+    return lines.length ? "Des associations harmonieuses avec les pièces que tu portes le moins :\n" + lines.join("\n") : "Je ne trouve pas d'association harmonieuse avec tes pièces les moins portées. Ajoute des basiques neutres (blanc, noir, denim, beige) : ils vont avec presque tout.";
+  }
+  const J = {...ui.jour, occ: occ || ui.jour.occ}, picks = suggest(J);
+  if(!picks.length) return `Aucune combinaison ne passe pour « ${WEATHER[J.weather].label.toLowerCase()} »${J.rain ? " avec pluie" : ""}. Ajoute des pièces de saison, ou change la météo dans « Tenue du jour ».`;
+  const p = picks[Math.floor(Math.random()*Math.min(3, picks.length))];
+  const fresh = wx.data && wx.data.day===today() && !wx.manual;
+  return `Pour ${OCCASIONS[J.occ].label.toLowerCase()}, ${fresh ? `${wx.data.min} à ${wx.data.max} °C` : `météo ${WEATHER[J.weather].label.toLowerCase()}`}${J.rain ? ", pluie" : ""} :\n` + p.pieces.map(i => `- ${B(i)} (${CATS[i.category].one.toLowerCase()})`).join("\n") + `\n\n${p.why.join(". ")}.`;
 }
 
 /* ---------- Navigation ---------- */
@@ -1381,7 +1630,7 @@ function brandMobile(){ return `<div class="mobile-brand"><div class="brand" sty
 function modeBanner(){
   if(STANDALONE){
     if(store.mode==="local") return `<div class="banner"><span>Sans compte, tes pièces restent sur cet appareil. Crée un compte pour les retrouver partout et ne pas les perdre.</span><button class="btn sm" data-act="g-open" data-v="signup">Créer un compte</button></div>`;
-    if(!store.ai) return `<div class="banner"><span>Ajoute ta clé Claude pour activer les tags automatiques, le scan en lot, le styliste et la recherche en boutique.</span><button class="btn sm" data-act="settings">Réglages</button></div>`;
+    if(!store.ai) return `<div class="banner"><span>Tout marche sans IA (détourage, couleurs, styliste). Une clé Claude ajoute la reconnaissance du type de vêtement et la recherche en boutique.</span><button class="btn sm" data-act="settings">Réglages</button></div>`;
     return "";
   }
   if(store.mode==="local") return `<div class="banner"><span>Mode hors connexion : tes pièces restent dans ce navigateur uniquement. Ouvre l'app depuis ton compte Claude pour les retrouver partout.</span></div>`;
@@ -1556,7 +1805,7 @@ function shopPanel(){
 function mSettings(){
   const k = getKey();
   return sheetHead("Réglages") + `
-    <div class="field"><label for="set-key">Clé API Claude</label><input class="input" id="set-key" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(k)}">
+    <div class="field"><label for="set-key">Clé API Claude (facultative)</label><input class="input" id="set-key" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(k)}">
     <span class="muted" style="font-size:13px">Active les tags automatiques, le scan en lot, l'avis de styliste, les annonces et la recherche en boutique. Crée une clé sur console.anthropic.com (facturation à l'usage, quelques centimes par photo ou recherche). La clé reste dans ce navigateur et n'est envoyée qu'à l'API Claude. Ne l'utilise que sur ton propre appareil.</span></div>
     <div class="row" style="margin-bottom:18px">${k?`<button class="btn sm danger" data-act="key-del">Retirer la clé</button>`:""}<span class="muted" style="font-size:13px">${k?"Clé enregistrée.":"Aucune clé enregistrée."}</span></div>
     <div class="field"><span class="lab">Sauvegarde</span><div class="row"><button class="btn sm" data-act="export">Exporter mes données</button><label class="btn sm">Importer une sauvegarde<input class="vh" type="file" id="import-file" accept="application/json,.json"></label></div>
@@ -1597,7 +1846,8 @@ const modal = { render:null, state:{},
     let caret = null; try{ caret = aid ? act.selectionStart : null; }catch{}
     el.innerHTML = `<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${this.render(this.state)}</div></div>`;
     el.querySelector(".sheet").scrollTop = keep;
-    if(aid){ const n = document.getElementById(aid); if(n){ n.focus({preventScroll:true}); try{ if(caret!=null) n.setSelectionRange(caret,caret); }catch{} } } },
+    if(aid){ const n = document.getElementById(aid); if(n){ n.focus({preventScroll:true}); try{ if(caret!=null) n.setSelectionRange(caret,caret); }catch{} } }
+    if(this.render===mCut) cutDraw(); },
   close(){ this.render = null; this.state = {}; $("#modal").innerHTML = ""; }
 };
 const sheetHead = t => `<div class="sheet-head"><h2>${t}</h2><button class="x" data-act="close" aria-label="Fermer">${ICONS.x}</button></div>`;
@@ -1606,14 +1856,14 @@ function mAdd(){
   const ai = store.ai && store.aiImages;
   const noAI = STANDALONE ? "Ajoute ta clé Claude dans les réglages pour l'activer." : "Nécessite l'accès à Claude.";
   return sheetHead("Ajouter des vêtements") + `<div class="choice">
-    <div class="pick">${ICONS.camera}<b>Une pièce en photo</b><span>${ai?"Claude détecte type, couleurs, saison et style.":"Tu renseignes les infos toi-même."}</span>
+    <div class="pick">${ICONS.camera}<b>Une pièce en photo</b><span>${ai?"Fond retiré, puis Claude détecte type, couleurs, saison et style.":"Fond retiré et couleurs détectées automatiquement ; tu choisis le type."}</span>
       <div class="row"><label class="btn sm primary">Appareil photo<input class="vh" type="file" id="file-one-cam" accept="image/*" capture="environment"></label><label class="btn sm">Galerie<input class="vh" type="file" id="file-one" accept="image/*"></label></div></div>
-    <div class="pick" ${ai?"":'aria-disabled="true"'}>${ICONS.layers}<b>Scan en lot</b><span>${ai?"Une photo de ta penderie ou de vêtements étalés : chaque pièce est découpée.":noAI}</span>
-      ${ai?`<div class="row"><label class="btn sm primary">Appareil photo<input class="vh" type="file" id="file-batch-cam" accept="image/*" capture="environment"></label><label class="btn sm">Galerie<input class="vh" type="file" id="file-batch" accept="image/*"></label></div>`:(STANDALONE?`<button class="btn sm" data-act="settings">Réglages</button>`:"")}</div>
+    <div class="pick">${ICONS.layers}<b>Scan en lot</b><span>${ai?"Une photo de ta penderie ou de vêtements étalés : Claude repère et découpe chaque pièce.":"Une photo de vêtements étalés : tu entoures chaque pièce, le fond est retiré tout seul."}</span>
+      <div class="row"><label class="btn sm primary">Appareil photo<input class="vh" type="file" id="file-batch-cam" accept="image/*" capture="environment"></label><label class="btn sm">Galerie<input class="vh" type="file" id="file-batch" accept="image/*"></label>${ai?`<label class="btn sm ghost">À la main<input class="vh" type="file" id="file-bman" accept="image/*"></label>`:""}</div></div>
     <button data-act="library" data-v="own">${ICONS.search}<b>Depuis la bibliothèque</b><span>Ex. « Air Force 1 blanche », sans photo.</span></button>
     <button data-act="manual">${ICONS.pen}<b>Saisie manuelle</b><span>Une illustration est générée à partir de la couleur.</span></button>
   </div>
-  <p class="muted" style="font-size:12px;margin:14px 0 0">Si « Appareil photo » ouvre seulement la galerie, ton navigateur ou l'app qui affiche la page bloque la caméra : ouvre le lien dans Safari ou Chrome. Le fond est éclairci à l'affichage ; un vrai détourage demande un serveur.</p>`;
+  <p class="muted" style="font-size:12px;margin:14px 0 0">Si « Appareil photo » ouvre seulement la galerie, ton navigateur ou l'app qui affiche la page bloque la caméra : ouvre le lien dans Safari ou Chrome. Le détourage se fait sur ton appareil, sans IA ni envoi de photo : il marche le mieux sur un fond uni.</p>`;
 }
 
 function chipsField(name, opts, sel, multi=true){
@@ -1625,7 +1875,7 @@ function mEdit(s){
     <div class="row" style="align-items:flex-start;flex-wrap:nowrap;gap:14px;margin-bottom:14px">
       <div style="width:120px;flex:none">${thumb(it)}</div>
       <div style="flex:1;min-width:0">${s.busy?`<p class="row muted" style="margin:0"><span class="spinner"></span> Claude analyse la photo…</p>`:s.aiNote?`<p class="muted" style="margin:0;font-size:13px">${esc(s.aiNote)}</p>`:""}
-        ${it.photo&&store.ai&&store.aiImages&&!s.busy?`<button class="btn sm" data-act="ed-retag" style="margin-top:8px">${ICONS.spark}Relancer l'analyse</button>`:""}</div>
+        <div class="row" style="margin-top:8px">${it.photo&&!s.busy?`<button class="btn sm" data-act="ed-cut">Détourer</button>`:""}${it.photo&&store.ai&&store.aiImages&&!s.busy?`<button class="btn sm" data-act="ed-retag">${ICONS.spark}Relancer l'analyse</button>`:""}</div></div>
     </div>
     <div class="field"><label for="ed-name">Nom</label><input class="input" id="ed-name" value="${esc(it.name)}" placeholder="Ex. Chemise Oxford bleue"></div>
     <div class="field"><label for="ed-brand">Marque</label><input class="input" id="ed-brand" value="${esc(it.brand)}"></div>
@@ -1659,7 +1909,7 @@ function mItem(s){
       <dt>Tenues</dt><dd>${inOutfits.length?inOutfits.map(o=>esc(o.name)).join(", "):"aucune"}</dd></dl></div>
     ${s.confirm?`<div class="confirm" style="margin-top:14px"><b>Supprimer « ${esc(i.name)} » ?</b><span class="muted" style="font-size:13px">Elle sera aussi retirée de ${inOutfits.length} tenue(s). Action définitive.</span><div class="row"><button class="btn sm" data-act="it-cancel">Garder</button><button class="btn sm danger" data-act="it-del-yes" data-id="${i.id}">Supprimer</button></div></div>`:""}
     <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn ghost danger" data-act="it-del" data-id="${i.id}">Supprimer</button>
-      <div class="row"><button class="btn" data-act="it-wear" data-id="${i.id}">Portée aujourd'hui</button><button class="btn primary" data-act="it-edit" data-id="${i.id}">Modifier</button></div></div>`;
+      <div class="row">${i.photo?`<button class="btn" data-act="it-cut" data-id="${i.id}">Détourer</button>`:""}<button class="btn" data-act="it-wear" data-id="${i.id}">Portée aujourd'hui</button><button class="btn primary" data-act="it-edit" data-id="${i.id}">Modifier</button></div></div>`;
 }
 
 function mLibrary(s){
@@ -1700,8 +1950,10 @@ function mDay(s){
 function mBatch(s){
   if(s.busy) return sheetHead("Scan en lot") + `<div class="empty"><span class="spinner"></span><p>Claude repère chaque vêtement sur la photo et le caractérise. Compte 10 à 30 secondes.</p></div>`;
   if(s.err) return sheetHead("Scan en lot") + `<p>${esc(s.err)}</p><button class="btn" data-act="close">Fermer</button>`;
-  return sheetHead(`${s.found.length} pièce${s.found.length>1?"s":""} détectée${s.found.length>1?"s":""}`) + `<p class="muted" style="margin-top:0;font-size:14px">Décoche ce qui est mal découpé ou en double. Tu pourras corriger chaque fiche ensuite.</p>
-    <div class="stack" style="gap:8px">${s.found.map((f,k)=>`<label class="scan-row"><input type="checkbox" data-act="b-tog" data-v="${k}" ${f.keep?"checked":""}>${thumb(f)}<div style="min-width:0"><b>${esc(f.name)}</b><div class="muted" style="font-size:13px">${CATS[f.category].one} · ${f.type} · ${(f.colors||[]).map(c=>COLOR_LABEL[c]).join(", ")}</div></div></label>`).join("")}</div>
+  return sheetHead(`${s.found.length} pièce${s.found.length>1?"s":""} ${s.manual?"découpée":"détectée"}${s.found.length>1?"s":""}`) + `<p class="muted" style="margin-top:0;font-size:14px">Décoche ce qui est mal découpé ou en double. Tu pourras corriger chaque fiche ensuite.</p>
+    <div class="stack" style="gap:8px">${s.found.map((f,k)=>`<label class="scan-row"><input type="checkbox" data-act="b-tog" data-v="${k}" ${f.keep?"checked":""}>${thumb(f)}<div style="min-width:0">${f.manual
+      ? `<div class="row" style="gap:6px"><select class="input" data-act="b-cat" data-v="${k}" aria-label="Catégorie">${Object.entries(CATS).map(([c,v])=>`<option value="${c}" ${f.category===c?"selected":""}>${v.one}</option>`).join("")}</select><select class="input" data-act="b-type" data-v="${k}" aria-label="Type">${CATS[f.category].types.map(t=>`<option ${f.type===t?"selected":""}>${t}</option>`).join("")}</select></div><div class="muted" style="font-size:13px;margin-top:4px">${(f.colors||[]).map(c=>COLOR_LABEL[c]).join(", ")||"couleur à préciser"}</div>`
+      : `<b>${esc(f.name)}</b><div class="muted" style="font-size:13px">${CATS[f.category].one} · ${f.type} · ${(f.colors||[]).map(c=>COLOR_LABEL[c]).join(", ")}</div>`}</div></label>`).join("")}</div>
     <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-act="close">Annuler</button><button class="btn primary" data-act="b-save">Ajouter ${s.found.filter(f=>f.keep).length} pièce(s)</button></div>`;
 }
 
@@ -1715,7 +1967,7 @@ function mSell(s){
     <p class="muted" style="font-size:12px;margin:12px 0 0">« Marquer vendue » retire la pièce de ta garde-robe.</p>`;
 }
 function sellTemplate(i){
-  return `${i.name}${i.brand?` – ${i.brand}`:""}${i.size?` – taille ${i.size}`:""}\n\nÉtat : très bon état, peu porté.\nCouleur : ${(i.colors||[]).map(c=>COLOR_LABEL[c]).join(", ")}\n${i.material?`Matière : ${i.material}\n`:""}Saison : ${(i.seasons||[]).map(x=>SEASONS[x]).join(", ")||"toutes saisons"}\n\nEnvoi rapide et soigné. N'hésitez pas à me poser vos questions.`;
+  return `${i.name}${i.brand?` – ${i.brand}`:""}${i.size?` – taille ${i.size}`:""}\n\nÉtat : très bon état, peu porté.\nCouleur : ${(i.colors||[]).map(c=>COLOR_LABEL[c]).join(", ")}\n${i.material?`Matière : ${i.material}\n`:""}Saison : ${(i.seasons||[]).map(x=>SEASONS[x]).join(", ")||"toutes saisons"}\n\nEnvoi rapide et soigné. N'hésitez pas à me poser vos questions.${fmtPrice(i.price) ? `\n\nPrix conseillé : ${Math.round(i.price*0.3)}–${Math.round(i.price*0.5)} € (30 à 50 % du prix d'achat, fourchette habituelle en seconde main)` : ""}`;
 }
 
 /* ---------- Actions ---------- */
@@ -1734,10 +1986,12 @@ async function analysePhoto(file, s){
 async function onPhotoOne(file){
   const im = await fileToImage(file).catch(()=>null);
   if(!im){ toast("Image illisible."); return; }
-  const it = newItem({photo: toDataURL(drawTo(im, 560))});
-  const s = {item:it, isNew:true, file};
-  modal.open(mEdit, s);
-  if(store.ai && store.aiImages) analysePhoto(file, s);
+  openCut(im, ({photo, colors}) => {
+    const ai = store.ai && store.aiImages;
+    const s = {item:newItem({photo, colors}), isNew:true, file, aiNote: ai ? "" : "Couleurs détectées sur la photo. Choisis la catégorie et le type, puis enregistre."};
+    modal.open(mEdit, s);
+    if(ai) analysePhoto(file, s);
+  });
 }
 async function onBatch(file){
   const s = {busy:true, found:[]}; modal.open(mBatch, s);
@@ -1837,6 +2091,17 @@ document.addEventListener("click", async e => {
     case "chat-p": askStylist(PROMPTS[+v][1]); break;
     case "chat-clear": chat.list = []; LS.set(chatKey(), []); render(); break;
     case "w-cat": ui.wishCat = v; render(); break;
+    case "cut-mode": s.mode = v; modal.paint(); break;
+    case "cut-undo": if(s.undo.length){ s.mask = s.undo.pop(); cutDraw(); } break;
+    case "cut-reset": if(s.c){ s.undo.push(s.mask.slice()); s.tol = 14; s.mask = autoMask(s.c, 14); modal.paint(); } break;
+    case "cut-ok": { if(s.busy) break; const photo = cutExport(s.c, s.mask); if(!photo){ toast("La pièce a été presque entièrement effacée : restaure-la ou réinitialise."); break; } s.done({photo, colors:colorsFrom(s.c, s.mask)}); break; }
+    case "cut-skip": s.done({photo:toDataURL(drawTo(s.im, 560)), colors:s.c ? colorsFrom(s.c, null) : []}); break;
+    case "ed-cut": { readEditFields(s); const back = s; const im = await loadImage(s.item.photo).catch(()=>null); if(!im) break;
+      openCut(im, r => { back.item.photo = r.photo; if(!(back.item.colors||[]).length) back.item.colors = r.colors; modal.open(mEdit, back); }); break; }
+    case "it-cut": { const i = DB.items.get(id); const im = await loadImage(i.photo).catch(()=>null); if(!im) break;
+      openCut(im, async r => { modal.close(); await put({...DB.items.get(id), photo:r.photo}); toast("Photo détourée."); }); break; }
+    case "bz-undo": s.rects.pop(); modal.paint(); break;
+    case "bz-next": batchCutNext(s); break;
     case "wish-new": modal.open(mWish, {wish:true, isNew:true, item:newWish()}); break;
     case "wish-edit": { const w = DB.wish.get(id); if(w) modal.open(mWish, {wish:true, isNew:false, item:JSON.parse(JSON.stringify(w))}); break; }
     case "wi-link": wishFromLink(s); break;
@@ -1933,7 +2198,8 @@ document.addEventListener("change", e => {
   if(t.type==="file" && t.files && t.files[0]){
     const f = t.files[0];
     if(t.id.startsWith("file-one")) onPhotoOne(f);
-    else if(t.id.startsWith("file-batch")) onBatch(f);
+    else if(t.id.startsWith("file-batch")) (store.ai && store.aiImages ? onBatch(f) : onBatchManual(f));
+    else if(t.id==="file-bman") onBatchManual(f);
     else if(t.id==="file-lib") onLibPhoto(f, s);
     else if(t.id==="import-file") importBackup(f);
     else if(t.id.startsWith("file-wish")) onWishPhoto(f, s);
@@ -1948,6 +2214,8 @@ document.addEventListener("change", e => {
   else if(t.id==="o-withwish"){ s.name = $("#o-name")?.value; s.withWish = t.checked; if(!t.checked) for(const k of Object.keys(s.sel)) if(DB.wish.has(s.sel[k])) s.sel[k] = null; modal.paint(); }
   else if(t.id==="ed-cat"){ readEditFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
   else if(t.dataset.act==="b-tog"){ s.found[+t.dataset.v].keep = t.checked; modal.paint(); }
+  else if(t.dataset.act==="b-cat"){ const f = s.found[+t.dataset.v]; f.category = t.value; f.type = CATS[t.value].types[0]; modal.paint(); }
+  else if(t.dataset.act==="b-type"){ s.found[+t.dataset.v].type = t.value; }
 });
 document.addEventListener("input", e => {
   const t = e.target;
@@ -1955,6 +2223,9 @@ document.addEventListener("input", e => {
   else if(t.id==="shop-q"){ ui.shop.q = t.value; }
   else if(t.id==="chat-q"){ chat.draft = t.value; t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; }
   else if(t.id==="wx-q"){ wx.q = t.value; }
+  else if(t.id==="cut-tol"){ const s = modal.state; if(!s.c) return; s.tol = +t.value; const o = $("#cut-tol-v"); if(o) o.textContent = s.tol < 10 ? "peu" : s.tol < 20 ? "normal" : "beaucoup";
+    clearTimeout(s.tt); s.tt = setTimeout(() => { s.undo.push(s.mask.slice()); s.mask = autoMask(s.c, s.tol); cutDraw(); }, 140); }
+  else if(t.id==="cut-brush"){ modal.state.brush = +t.value; }
   else if(t.id==="wi-zoom"){ const c = modal.state.crop; if(c){ c.z = +t.value/100; const img = $("#crop-img"); if(img) img.style.cssText = cropGeom(c).css; const o = $("#wi-zoom-v"); if(o) o.textContent = t.value + " %"; } }
   else if(t.id==="lib-q"){ const s = modal.state; s.q = t.value; s.matches = null; const pos = t.selectionStart; modal.paint(); const n=$("#lib-q"); n.focus(); n.setSelectionRange(pos,pos); }
 });
@@ -1990,7 +2261,8 @@ document.addEventListener("click", e => { /* enregistrement du lot */
   const el = e.target.closest('[data-act="b-save"]'); if(!el) return;
   const s = modal.state; const keep = s.found.filter(f=>f.keep);
   modal.close(); ui.jour.picks = null;
-  (async()=>{ for(const f of keep){ const {keep:_, ...doc} = f; await put(doc); } toast(`${keep.length} pièce(s) ajoutée(s).`); })();
+  const docs = keep.map(f => { const {keep:_, manual, ...doc} = f; if(manual){ if(!doc.colors.length) doc.colors = ["gris"]; doc.name = `${doc.type} ${COLOR_LABEL[doc.colors[0]].toLowerCase()}`; } return doc; });
+  saveMany(docs).then(() => toast(`${docs.length} pièce(s) ajoutée(s). Touche une pièce pour compléter sa fiche.`));
 });
 window.addEventListener("hashchange", ()=>{ const h = location.hash.slice(1); if(VIEWS[h] && h!==ui.tab){ ui.tab = h; render(); } });
 addEventListener("online", () => { if(store.mode==="cloud") flushSoon(0); });

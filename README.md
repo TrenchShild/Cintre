@@ -7,7 +7,8 @@ Prototype de dressing numérique : une application web mobile, installable. Tout
 - Comptes : identifiant et mot de passe via Supabase. Les données se synchronisent entre appareils et l'app fonctionne hors ligne : les modifications sont envoyées au retour du réseau. Un mode « sans compte » garde les données sur l'appareil.
 - Installation : Safari → Partager → « Sur l'écran d'accueil » (iPhone), ou menu → « Installer l'application » (Android/Chrome).
 - Météo : prévision du jour via Open-Meteo (gratuit, sans clé).
-- Fonctions IA (tags automatiques, scan en lot, styliste, recherche en boutique) : nécessitent une clé API Claude, à coller dans Réglages.
+- Sans IA (gratuit, sur l'appareil) : détourage des photos (fond retiré depuis les bords + retouche au doigt), détection des couleurs, scan en lot en entourant chaque pièce, styliste à base de règles.
+- Avec une clé API Claude (facultative, dans Réglages) : reconnaissance du type de vêtement, scan en lot automatique, styliste en conversation libre, recherche en boutique en direct.
 
 ## Mise en place de Supabase (une seule fois)
 
