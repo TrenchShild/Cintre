@@ -233,7 +233,7 @@ label.btn:focus-within{outline:2px solid var(--accent);outline-offset:2px}
 .spinner{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spinner,.scrim,.sheet{animation:none}.piece,.btn{transition:none}}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;z-index:60;max-width:calc(100% - 32px);box-shadow:var(--shadow-lg);animation:fade .2s}
+.toast{pointer-events:auto;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;z-index:60;max-width:calc(100% - 32px);box-shadow:var(--shadow-lg);animation:fade .2s}
 @media (min-width:900px){.toast{bottom:28px}}
 .scan-row{display:flex;gap:12px;align-items:center;padding:8px;border-radius:var(--r-sm);background:var(--surface);box-shadow:var(--shadow)}
 .scan-row .thumb{width:60px;flex:none;aspect-ratio:1}
@@ -368,6 +368,37 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .bz-r{position:absolute;border:2.5px solid var(--accent);background:rgba(79,70,229,.14);border-radius:6px;pointer-events:none}
 .bz-r span{position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font:700 11px/1 var(--f-body);padding:3px 7px;border-radius:999px}
 .bz-r.tmp{border-style:dashed}
+.seg button{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.seg button svg{width:13px;height:13px}
+@media (max-width:520px){.outfits{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.outfit{padding:6px 6px 10px;gap:8px}.outfit h3{font-size:15px}.outfit .tags{display:none}.outfit .fav{padding:6px}}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}
+.tgrid button{border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:14px;padding:6px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:600}
+.tgrid button svg{width:44px;height:44px}
+.tgrid button[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--accent);background:var(--accent-soft)}
+.sugg{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.sugg .mono{display:inline-flex;align-items:center;gap:4px;color:var(--accent)}
+.sugg .mono svg{width:13px;height:13px}
+.sugg .chip{box-shadow:none;background:var(--accent-soft)}
+.sugg .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+details.more{background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--shadow);padding:0 14px;margin-bottom:12px}
+details.more>summary{cursor:pointer;list-style:none;padding:14px 0;font-weight:600;font-size:14px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"+";font-weight:700;color:var(--accent);width:12px}
+details.more[open]>summary::before{content:"–"}
+details.more>summary .muted{font-weight:400;font-size:12.5px}
+details.more[open]{padding-bottom:14px}
+details.more .panel{box-shadow:none}
+.edit-actions{justify-content:flex-end;position:sticky;bottom:-1px;background:var(--bg);padding:12px 0 4px;margin-top:4px}
+.flat{display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr .72fr;grid-template-areas:"haut couche" "bas couche" "chaus acc";gap:4px;aspect-ratio:4/5;background:var(--swatch);border-radius:var(--r-sm);padding:6px}
+.flat.solo{grid-template-columns:1fr;grid-template-areas:"haut" "bas" "chaus"}
+.flat>div{min-height:0;min-width:0}
+.fl-haut{grid-area:haut}.fl-bas{grid-area:bas}.fl-chaus{grid-area:chaus}.fl-couche{grid-area:couche}.fl-acc{grid-area:acc}.fl-robe{grid-row:1/3;grid-column:1}
+.flat .thumb{aspect-ratio:auto;width:100%;height:100%;background:transparent;border-radius:8px}
+.flat .thumb svg{width:86%;height:86%}
+.bar{height:8px;border-radius:999px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .4s}
+.onboard h2{letter-spacing:-.035em}
+.toast-undo{background:none;border:0;color:var(--hero-accent);font-weight:700;margin-left:10px;padding:0}
 .pick-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
 .pick-strip button{flex:none;width:72px;height:90px;padding:0;border:0;border-radius:12px;overflow:hidden;background:var(--surface);display:grid;place-items:center}
 .pick-strip button[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--accent)}
@@ -387,6 +418,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 </div>
 <div id="modal"></div>
 <div id="toast" class="toast" hidden></div>
+<input class="vh" type="file" id="file-rafale-cam" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true">
+<input class="vh" type="file" id="file-rafale-gal" accept="image/*" tabindex="-1" aria-hidden="true">
 
 <script>
 /* ---------- Référentiels ---------- */
@@ -457,7 +490,7 @@ const today = () => iso(new Date());
 const daysBetween = (a,b) => Math.round((new Date(b) - new Date(a)) / 864e5);
 const fmtDate = d => new Date(d + "T12:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
 let toastTimer;
-function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,2600); }
+function toast(msg, undo){ const t=$("#toast"); t.innerHTML = esc(msg) + (undo ? ` <button class="toast-undo" id="toast-undo">Annuler</button>` : ""); t.hidden=false; clearTimeout(toastTimer); toastUndo = undo || null; toastTimer=setTimeout(()=>{ t.hidden=true; toastUndo = null; }, undo ? 6500 : 2600); }
 
 /* ---------- Illustrations ---------- */
 const SHAPES = {
@@ -486,7 +519,8 @@ function illo(item){
 }
 function thumb(item){
   if(!item) return `<div class="thumb"></div>`;
-  return `<div class="thumb">${item.photo ? `<img src="${item.photo}" alt="">` : illo(item)}</div>`;
+  const src = photoSrc(item.photo);
+  return `<div class="thumb">${src ? `<img src="${esc(src)}" alt="" loading="lazy">` : illo(item)}</div>`;
 }
 const ICONS = {
   dressing:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7a2 2 0 1 1 2-2"/><path d="M12 7v2L3 15.5a1.4 1.4 0 0 0 .8 2.5h16.4a1.4 1.4 0 0 0 .8-2.5L12 9"/></svg>',
@@ -505,6 +539,7 @@ const ICONS = {
   accueil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5.5v-6h-5v6H4Z"/></svg>',
   styliste:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9.5L4 20Z"/><path d="m12 7.3.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z" fill="currentColor" stroke="none"/></svg>',
   send:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  share:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
   spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg>'
 };
@@ -517,21 +552,29 @@ function ingest(docs){
   for(const m of Object.values(DB)) m.clear();
   for(const [id, d] of docs){ const k = KIND_OF[d.kind]; if(k) DB[k].set(id, {...d, id}); }
 }
-function localLoad(){ return LS.get(cacheKey(), {}) || {}; }
-let storageWarned = false;
+async function localLoad(){ return (await kvGet(cacheKey())) || {}; }
+let storageWarned = false, saveTimer = null;
 function localSave(){
+  const k = cacheKey(); clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => localSaveNow(k), 120);
+}
+async function localSaveNow(k){
   const all = {}; for(const m of Object.values(DB)) for(const [id,d] of m) all[id]=d;
-  if(!LS.set(cacheKey(), all) && !storageWarned){ storageWarned = true; toast(store.mode==="cloud" ? "Mémoire du navigateur pleine : tes données restent dans ton compte, mais l'accès hors ligne est limité." : "Stockage du navigateur plein : retire des photos ou crée un compte."); }
+  if(!(await kvSet(k, all)) && !storageWarned){ storageWarned = true; toast(store.mode==="cloud" ? "Mémoire du navigateur pleine : tes données restent dans ton compte, mais l'accès hors ligne est limité." : "Stockage du navigateur plein : retire des photos ou crée un compte."); }
 }
 /* Enregistre / supprime un lot d'éléments, quel que soit le mode (base Claude, compte Supabase, appareil) */
 async function saveMany(docs){
-  for(const d of docs){ const k = KIND_OF[d.kind]; if(k) DB[k].set(d.id, d); }
+  const old = [];
+  for(const d of docs){ const k = KIND_OF[d.kind]; if(!k) continue; const prev = DB[k].get(d.id); if(prev && (prev.photo||"").startsWith("sb:") && prev.photo !== d.photo) old.push(prev.photo.slice(3)); DB[k].set(d.id, d); }
+  trashPhotos(old);
   render();
   if(store.mode==="db"){ for(const d of docs){ const {id, ...data} = d; try{ await store.col.doc(id).set(data); }catch(e){ toast("Enregistrement refusé : " + (e.code||"erreur")); break; } } }
   else { localSave(); if(store.mode==="cloud") queue(docs.map(d => ({op:"put", id:d.id}))); }
 }
 async function removeMany(ids){
-  for(const id of ids) for(const m of Object.values(DB)) m.delete(id);
+  const old = [];
+  for(const id of ids) for(const m of Object.values(DB)){ const d = m.get(id); if(d && (d.photo||"").startsWith("sb:")) old.push(d.photo.slice(3)); m.delete(id); }
+  trashPhotos(old);
   render();
   if(store.mode==="db"){ for(const id of ids){ try{ await store.col.doc(id).delete(); }catch(e){ toast("Suppression refusée."); break; } } }
   else { localSave(); if(store.mode==="cloud") queue(ids.map(id => ({op:"del", id}))); }
@@ -558,8 +601,8 @@ async function initStore(){
       render();
     }, err => { clearTimeout(timer); store.loaded = true; toast("Base indisponible (" + err.code + ")."); render(); });
   } else {
-    store.mode = "local"; store.loaded = true;
-    ingest(Object.entries(localLoad()));
+    store.mode = "local";
+    ingest(Object.entries(await localLoad())); store.loaded = true;
     render();
   }
 }
@@ -930,6 +973,13 @@ async function flush(){
   try{
     const sb = await supa(); const uid = auth.user.id;
     const puts = ids.filter(id => snap[id].op==="put").map(findDoc).filter(Boolean);
+    let moved = false;
+    for(const d of puts){
+      if(!/^data:/.test(d.photo||"") || store.photosOK === false) continue;
+      try{ const np = await uploadPhoto(sb, d); const cur = findDoc(d.id); if(cur && cur.photo === d.photo){ cur.photo = np; moved = true; } d.photo = np; }
+      catch(e){ if(/bucket|not.?found|404/i.test(String(e?.message||e?.statusCode||e?.error||""))){ store.photosOK = false; } else throw e; }
+    }
+    if(moved){ localSave(); render(); }
     const orphan = ids.filter(id => snap[id].op==="put" && !findDoc(id));
     const dels = ids.filter(id => snap[id].op==="del");
     for(let k=0; k<puts.length; k+=20){
@@ -940,6 +990,7 @@ async function flush(){
     }
     if(dels.length){ const {error} = await sb.from(CLOUD.table).delete().eq("user_id", uid).in("id", dels); if(error) throw error; done(dels); }
     done(orphan);
+    emptyTrash(sb).catch(()=>{});
     setSync("ok");
   }catch(e){ setSync(isNetErr(e) ? "offline" : "error", e); }
   flushing = false;
@@ -960,7 +1011,12 @@ async function cloudPull(){
 async function syncNow(){
   if(store.mode!=="cloud") return;
   setSync("syncing");
-  try{ await cloudPull(); await flush(); }
+  try{
+    await cloudPull();
+    const legacy = []; for(const m of Object.values(DB)) for(const d of m.values()) if(/^data:/.test(d.photo||"")) legacy.push({op:"put", id:d.id});
+    if(legacy.length && store.photosOK !== false) queue(legacy);
+    await flush();
+  }
   catch(e){ setSync(isNetErr(e) ? "offline" : "error", e); }
 }
 function syncErrText(e){
@@ -994,16 +1050,17 @@ function startStandalone(){
   else if(LS.get("cintre.guest")) enterGuest();
   else { showGate(""); supa().catch(()=>{}); }
 }
-function enterGuest(){
-  auth.user = null; chat.list = null; store.mode = "local"; store.loaded = true;
-  ingest(Object.entries(localLoad())); hideGate(); ui.jour.picks = null; render();
+async function enterGuest(){
+  auth.user = null; chat.list = null; store.mode = "local"; store.loaded = false; hideGate(); render();
+  ingest(Object.entries(await localLoad())); store.loaded = true; ui.jour.picks = null; render();
 }
-function enterCloud(user, fresh){
+async function enterCloud(user, fresh){
   auth.user = user; chat.list = null; LS.set("cintre.user", user); LS.del("cintre.guest");
-  store.mode = "cloud"; store.loaded = true; store.sync = "ok";
-  ingest(Object.entries(localLoad()));
+  store.mode = "cloud"; store.loaded = false; store.sync = "ok"; hideGate(); render();
+  ingest(Object.entries(await localLoad())); store.loaded = true;
+  auth.guestDocs = Object.values((await kvGet("cintre.v1")) || {}).filter(x => x && KIND_OF[x.kind] && x.id);
   store.pending = Object.keys(LS.get(outboxKey(), {}) || {}).length;
-  hideGate(); ui.jour.picks = null; render();
+  ui.jour.picks = null; render();
   if(fresh) syncNow();
 }
 async function verifySession(){
@@ -1080,14 +1137,16 @@ async function logout(force){
   const pend = Object.keys(LS.get(outboxKey(), {}) || {}).length;
   if(pend && !force){ modal.state.confirmLogout = pend; modal.paint(); return; }
   try{ const sb = await supa(); await sb.auth.signOut({scope:"local"}); }catch{}
-  if(auth.user){ LS.del(`cintre.cloud.${auth.user.id}`); LS.del(outboxKey()); LS.del(`cintre.chat.${auth.user.id}`); }
+  clearTimeout(saveTimer);
+  if(auth.user){ await kvDel(`cintre.cloud.${auth.user.id}`); LS.del(outboxKey()); LS.del(trashKey()); LS.del(`cintre.chat.${auth.user.id}`); }
+  for(const k of Object.keys(signed)) delete signed[k]; LS.del("cintre.signed");
   LS.del("cintre.user");
   for(const m of Object.values(DB)) m.clear();
   auth.user = null; chat.list = null; store.mode = "loading"; store.loaded = false; auth.tab = "login"; auth.form = {};
   showGate("Tu es déconnecté. À bientôt !");
 }
 /* Données saisies sans compte sur cet appareil, avant la connexion */
-function guestDocs(){ if(store.mode!=="cloud" || LS.get("cintre.v1.skip")) return []; const d = LS.get("cintre.v1", {}) || {}; return Object.values(d).filter(x => x && KIND_OF[x.kind] && x.id); }
+function guestDocs(){ if(store.mode!=="cloud" || LS.get("cintre.v1.skip")) return []; return auth.guestDocs || []; }
 function transferBanner(){
   const docs = guestDocs(); if(!docs.length) return "";
   const n = docs.filter(d=>d.kind==="item").length;
@@ -1095,7 +1154,7 @@ function transferBanner(){
 }
 async function transferGuest(){
   const docs = guestDocs(); if(!docs.length) return;
-  LS.set("cintre.v1.bak", LS.get("cintre.v1", {})); LS.del("cintre.v1");
+  await kvSet("cintre.v1.bak", (await kvGet("cintre.v1")) || {}); await kvDel("cintre.v1"); auth.guestDocs = [];
   ui.jour.picks = null; await saveMany(docs); toast(`${docs.length} éléments ajoutés à ton compte.`);
 }
 
@@ -1121,6 +1180,9 @@ function mAccount(s){
     <div class="panel js-sync" style="background:var(--sunk);box-shadow:none;margin-bottom:16px;padding:14px 16px">${syncHTML()}</div>
     ${transferBanner()}
     ${s.confirmLogout ? `<div class="confirm" style="margin-bottom:14px"><b>${s.confirmLogout} modification${s.confirmLogout>1?"s":""} pas encore envoyée${s.confirmLogout>1?"s":""}</b><span class="muted" style="font-size:13px">Si tu te déconnectes maintenant, elle${s.confirmLogout>1?"s":""} sera${s.confirmLogout>1?"ont":""} perdue${s.confirmLogout>1?"s":""}. Reconnecte-toi au réseau et synchronise d'abord.</span><div class="row"><button class="btn sm" data-act="sync-now">Synchroniser</button><button class="btn sm danger" data-act="logout-yes">Me déconnecter quand même</button></div></div>` : ""}
+    <details class="more" data-k="pwOpen" ${s.pwOpen ? "open" : ""} style="margin-bottom:16px"><summary>Changer de mot de passe</summary>
+      <div class="row" style="flex-wrap:nowrap"><input class="input" id="acc-pw" type="password" autocomplete="new-password" placeholder="Nouveau mot de passe (6 caractères min.)" style="flex:1;min-width:0"><button class="btn" data-act="acc-pw">Enregistrer</button></div>
+      <p class="muted" style="font-size:12px;margin:8px 0 0">Mot de passe oublié ? Sans e-mail, il n'y a pas de lien de réinitialisation : le propriétaire de l'app peut le changer dans Supabase (Authentication → Users).</p></details>
     <div class="row" style="justify-content:space-between"><button class="btn" data-act="settings">Réglages</button><div class="row"><button class="btn" data-act="sync-now">Synchroniser</button><button class="btn danger" data-act="logout">Se déconnecter</button></div></div>`;
 }
 
@@ -1233,6 +1295,7 @@ async function onWishPhoto(file, s){
   const im = await fileToImage(file).catch(() => null); if(!im){ toast("Image illisible."); return; }
   s.crop = imgToCrop(im); s.noPhoto = false; s.err = ""; if(modal.state===s) modal.paint();
   if(store.ai && store.aiImages) tagWish(s, im);
+  else if(lai.on){ const keep = s.item.photo; s.item.photo = s.crop.src; await laiTagItem(s); s.item.photo = keep; }
 }
 async function tagWish(s, im){
   s.busy = true; s.aiNote = ""; modal.paint();
@@ -1338,6 +1401,8 @@ function viewAccueil(){
       <p>Compose tes looks préférés et retrouve-les en un clin d'œil.</p>
       <button class="btn" data-act="new-outfit">Composer une tenue <span aria-hidden="true">↗</span></button></div>`;
   const all = items();
+  const ob = onboardBlock();
+  if(all.length < 5 && ob) return head + ob + `<div class="home-grid" style="margin-top:16px">${hero}</div>`;
   if(!all.length) return head + `<div class="home-grid">${hero}<div class="panel empty">
       <h2>Ta penderie est vide</h2><p>Ajoute tes premières pièces en photo, scanne ta penderie d'un coup, ou explore l'app avec une garde-robe d'exemple.</p>
       <div class="row" style="justify-content:center"><button class="btn primary" data-act="add">${ICONS.plus}Ajouter mes vêtements</button><button class="btn" data-act="demo">Charger l'exemple</button></div></div></div>`;
@@ -1364,7 +1429,7 @@ function viewAccueil(){
       <button class="shortcut" data-act="tab" data-v="revente"><span class="ic">${ICONS.revente}</span><span class="body"><b>${sleeping} pièce${sleeping>1?"s":""} à revoir</b><span>Celles qui dorment dans ton placard.</span></span></button>
       <button class="shortcut" data-act="tab" data-v="tenues" data-cal="1"><span class="ic">${ICONS.jour}</span><span class="body"><b>Calendrier</b><span>Ce que tu as porté, jour par jour.</span></span></button>
     </div>`;
-  return head + `<div class="home-grid">${todayCard}${hero}</div>` + stat + outsBlock + itemsBlock + shortcuts;
+  return head + (ob ? `<div style="margin-bottom:16px">${ob}</div>` : "") + `<div class="home-grid">${todayCard}${hero}</div>` + stat + outsBlock + itemsBlock + shortcuts;
 }
 
 /* ---------- Styliste : vue ---------- */
@@ -1505,7 +1570,9 @@ function mCut(s){
   return sheetHead("Détourage") + `
     <p class="muted" style="margin:-8px 0 12px;font-size:13px">Le fond est retiré automatiquement, directement sur ton appareil. Ça marche le mieux avec la pièce posée à plat ou suspendue devant un fond uni (lit, sol, mur). Retouche au doigt si besoin.</p>
     <div class="cut-wrap"><canvas id="cut-cv" class="cut-cv" aria-label="Aperçu du détourage. Glisse le doigt pour effacer ou restaurer."></canvas>${s.busy ? '<div class="cut-busy"><span class="spinner"></span></div>' : ""}</div>
-    <div class="field" style="margin:14px 0 10px"><label for="cut-tol" class="row" style="justify-content:space-between">Fond retiré <span class="mono" id="cut-tol-v">${s.tol < 10 ? "peu" : s.tol < 20 ? "normal" : "beaucoup"}</span></label><input type="range" id="cut-tol" min="4" max="36" step="1" value="${s.tol}"></div>
+    ${!lai.on && !lai.asked ? `<div class="banner" style="margin:12px 0 0"><span><b>Détourage IA gratuit</b> : plus précis sur les fonds chargés, et reconnaît le type de vêtement. Tout reste sur ton téléphone. Téléchargement unique d'environ 65 Mo (Wi-Fi conseillé).</span><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="lai-no">Non merci</button><button class="btn sm primary" data-act="lai-yes">Activer</button></div></div>` : ""}
+    ${lai.on ? `<div class="row" style="justify-content:space-between;margin:14px 0 4px"><div class="seg" role="group" aria-label="Méthode"><button data-act="cut-method" data-v="ai" aria-pressed="${s.method==="ai"}">${ICONS.spark} IA</button><button data-act="cut-method" data-v="classic" aria-pressed="${s.method!=="ai"}">Classique</button></div>${s.aiErr ? `<span class="muted" style="font-size:12px">${esc(s.aiErr)}</span>` : ""}</div>` : ""}
+    ${s.method==="ai" ? "" : `<div class="field" style="margin:14px 0 10px"><label for="cut-tol" class="row" style="justify-content:space-between">Fond retiré <span class="mono" id="cut-tol-v">${s.tol < 10 ? "peu" : s.tol < 20 ? "normal" : "beaucoup"}</span></label><input type="range" id="cut-tol" min="4" max="36" step="1" value="${s.tol}"></div>`}
     <div class="row" style="justify-content:space-between;margin-bottom:12px">
       <div class="seg" role="group" aria-label="Pinceau"><button data-act="cut-mode" data-v="erase" aria-pressed="${s.mode==="erase"}">Effacer</button><button data-act="cut-mode" data-v="keep" aria-pressed="${s.mode==="keep"}">Restaurer</button></div>
       <label class="row" style="font-size:13px;gap:6px;flex-wrap:nowrap">Pinceau <input type="range" id="cut-brush" min="1" max="10" value="${s.brush}" style="width:90px"></label></div>
@@ -1513,7 +1580,7 @@ function mCut(s){
     <div class="row" style="justify-content:space-between"><button class="btn ghost" data-act="cut-skip">Garder l'original</button><button class="btn primary" data-act="cut-ok" ${s.busy?"disabled":""}>Valider</button></div>`;
 }
 function cutDraw(fast){
-  const s = modal.state, cv = $("#cut-cv"); if(!cv || !s || !s.c) return;
+  const s = modal.state, cv = $("#cut-cv"); if(!cv || !s || !s.c || !s.mask) return;
   const {W, H, data} = s.c;
   if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; }
   const ctx = cv.getContext("2d"), img = ctx.createImageData(W, H); img.data.set(data);
@@ -1522,11 +1589,19 @@ function cutDraw(fast){
   ctx.putImageData(img, 0, 0);
 }
 async function openCut(im, done){
-  const s = {busy:true, tol:14, mode:"erase", brush:4, undo:[], done, im};
+  const s = {busy:true, tol:14, mode:"erase", brush:4, undo:[], done, im, method: lai.on ? "ai" : "classic"};
   modal.open(mCut, s);
   await new Promise(r => setTimeout(r, 40));
-  s.c = cutPrepare(im); s.mask = autoMask(s.c, s.tol); s.busy = false;
-  if(modal.state === s) modal.paint();
+  s.c = cutPrepare(im);
+  await cutRun(s);
+}
+async function cutRun(s){
+  s.busy = true; s.aiErr = ""; if(modal.state === s) modal.paint();
+  if(s.method === "ai"){
+    try{ s.mask = await laiMask(s.c); }
+    catch{ s.aiErr = "IA indisponible (connexion ?) : méthode classique."; s.method = "classic"; s.mask = autoMask(s.c, s.tol); }
+  } else s.mask = autoMask(s.c, s.tol);
+  s.busy = false; if(modal.state === s) modal.paint();
 }
 let cutStroke = null, cutRaf = 0, bzDrag = null;
 function brushAt(e){
@@ -1572,9 +1647,13 @@ async function batchCutNext(s){
   s.busy = true; modal.paint(); const found = [];
   for(const r of s.rects){
     await new Promise(res => setTimeout(res, 0));
-    const c = cutPrepare(s.im, r), mask = autoMask(c, 14);
+    const c = cutPrepare(s.im, r); let mask = null;
+    if(lai.on){ try{ mask = await laiMask(c); }catch{} }
+    if(!mask) mask = autoMask(c, 14);
     const photo = cutExport(c, mask) || toDataURL(drawTo(s.im, 560, r));
-    found.push({...newItem({photo, colors:colorsFrom(c, mask)}), keep:true, manual:true});
+    const f = {...newItem({photo, colors:colorsFrom(c, mask)}), keep:true, manual:true};
+    if(lai.on){ try{ applyType(f, (await laiClassify(photo))[0]); }catch{} }
+    found.push(f);
   }
   if(modal.state !== s) return;
   modal.open(mBatch, {found, manual:true});
@@ -1714,7 +1793,7 @@ async function itemFromLink(s){
     if(p.brand && !it.brand){ it.brand = p.brand; got.push("marque"); }
     if(p.price!=null && (it.price==null || it.price==="")){ it.price = p.price; got.push("prix"); }
     const g = guessFromText(`${p.name} ${p.color} ${p.desc}`), gn = guessFromText(`${p.name} ${p.color}`);
-    if(g.category && !s.catTouched){ it.category = gn.category || g.category; it.type = gn.type || g.type; got.push("catégorie"); }
+    if(g.type && !s.catTouched){ applyType(it, gn.type || g.type); got.push("type"); }
     if(gn.colors){ it.colors = gn.colors; got.push("couleur"); }
     s.webImages = p.images.length > 1 ? p.images : null; s.pickedImg = 0;
     if(p.image){ s.linkMsg = "Récupération de la photo…"; modal.paint(); const ph = await webPhoto(p.image); if(modal.state!==s) return; if(ph){ s.webPhoto = ph; got.push(p.images.length > 1 ? `${p.images.length} photos du site` : "photo du site"); } }
@@ -1728,6 +1807,7 @@ async function lensSearch(s){
   readEditFields(s); const photo = s.item.photo;
   if(!photo){ toast("Ajoute d'abord une photo de la pièce."); return; }
   const after = "Dans Google Lens, ouvre le résultat qui correspond à ta pièce, copie l'adresse de la page, puis colle-la ci-dessus et touche « Remplir ».";
+  if(photo.startsWith("sb:")){ const u = photoSrc(photo); if(u){ window.open(lensUrl(u), "_blank", "noopener"); s.linkMsg = after; modal.paint(); } else toast("Photo en cours de chargement, réessaie dans un instant."); return; }
   if(/^https?:/.test(photo)){ window.open(lensUrl(photo), "_blank", "noopener"); s.linkMsg = after; modal.paint(); return; }
   const blob = dataURLtoBlob(photo);
   if(store.mode==="cloud"){
@@ -1784,6 +1864,225 @@ function findBlock(s){
     ${s.webImages ? `<div class="mono muted" style="margin:12px 0 6px">Choisis la photo (${s.webImages.length} sur la page)</div><div class="pick-strip">${s.webImages.map((u,k)=>`<button data-act="ed-pickimg" data-v="${k}" aria-pressed="${s.pickedImg===k}" aria-label="Photo ${k+1}">${s.pickBusy===k?'<span class="spinner"></span>':`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.hidden=true">`}</button>`).join("")}</div>` : ""}
     ${s.webPhoto ? `<div class="row" style="flex-wrap:nowrap;gap:12px;margin-top:12px"><div style="width:64px;flex:none">${thumb({photo:s.webPhoto})}</div><div class="row" style="flex:1">${it.photo===s.webPhoto ? `<span class="muted" style="font-size:13px">Photo trouvée utilisée.</span>${s.ownPhoto?`<button class="btn sm ghost" data-act="ed-ownphoto">Reprendre ma photo</button>`:""}` : `<button class="btn sm" data-act="ed-webphoto">Utiliser la photo du site</button>`}</div></div>` : ""}
   </div>`;
+}
+
+/* ---------- Stockage local : IndexedDB (plus de limite à ~5 Mo comme localStorage) ---------- */
+const IDB = (() => {
+  let p = null;
+  const open = () => p || (p = new Promise((res, rej) => { const r = indexedDB.open("cintre", 1); r.onupgradeneeded = () => r.result.createObjectStore("kv"); r.onsuccess = () => res(r.result); r.onerror = () => { p = null; rej(r.error); }; }));
+  const tx = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction("kv", mode), r = fn(t.objectStore("kv")); t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error); }); };
+  return { get: k => tx("readonly", s => s.get(k)), set: (k, v) => tx("readwrite", s => s.put(v, k)), del: k => tx("readwrite", s => s.delete(k)) };
+})();
+async function kvGet(k){
+  try{ let v = await IDB.get(k); if(v === undefined){ const old = LS.get(k, null); if(old){ await IDB.set(k, old); LS.del(k); v = old; } } return v; }
+  catch{ return LS.get(k, undefined); }
+}
+async function kvSet(k, v){ try{ await IDB.set(k, v); return true; }catch{ return LS.set(k, v); } }
+async function kvDel(k){ try{ await IDB.del(k); }catch{} LS.del(k); }
+
+/* ---------- Photos des comptes : stockage Supabase privé, liens signés ---------- */
+const PHOTO_BUCKET = "photos";
+const signed = LS.get("cintre.signed", {}) || {};
+const signQueue = new Set(); let signTimer = null;
+function photoSrc(p){
+  if(!p) return "";
+  if(!p.startsWith("sb:")) return p;
+  const path = p.slice(3), s = signed[path];
+  if(!s || s.e < Date.now() + 6*3600e3){ signQueue.add(path); clearTimeout(signTimer); signTimer = setTimeout(signNow, 40); }
+  return s && s.e > Date.now() ? s.u : "";
+}
+async function signNow(){
+  const paths = [...signQueue]; signQueue.clear();
+  if(!paths.length || store.mode !== "cloud") return;
+  try{
+    const sb = await supa(), {data, error} = await sb.storage.from(PHOTO_BUCKET).createSignedUrls(paths, 7*86400);
+    if(error) throw error;
+    const exp = Date.now() + 7*86400e3 - 120e3;
+    for(const r of data || []){ const u = r.signedUrl || r.signedURL; if(u && !r.error) signed[r.path] = {u, e:exp}; }
+    LS.set("cintre.signed", signed); render();
+  }catch{}
+}
+async function uploadPhoto(sb, d){
+  const blob = dataURLtoBlob(d.photo), ext = /png/.test(blob.type) ? "png" : "jpg";
+  const path = `${auth.user.id}/${d.id}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const {error} = await sb.storage.from(PHOTO_BUCKET).upload(path, blob, {contentType:blob.type || "image/jpeg", upsert:false, cacheControl:"31536000"});
+  if(error) throw error;
+  return "sb:" + path;
+}
+const trashKey = () => `cintre.trash.${auth.user?.id}`;
+function trashPhotos(paths){ if(store.mode !== "cloud" || !paths.length) return; const t = LS.get(trashKey(), []) || []; for(const p of paths) t.push([p, Date.now()]); LS.set(trashKey(), t); }
+async function emptyTrash(sb){
+  const t = LS.get(trashKey(), []) || []; if(!t.length) return;
+  const used = new Set(); for(const m of Object.values(DB)) for(const d of m.values()) if((d.photo||"").startsWith("sb:")) used.add(d.photo.slice(3));
+  const ripe = t.filter(([p, at]) => Date.now() - at > 90e3 && !used.has(p)).map(([p]) => p);
+  const keep = t.filter(([p, at]) => Date.now() - at <= 90e3 && !used.has(p));
+  if(ripe.length){ try{ await sb.storage.from(PHOTO_BUCKET).remove(ripe); }catch{ return; } }
+  LS.set(trashKey(), keep);
+}
+async function loadImageAny(src){
+  try{ return await new Promise((res, rej) => { const im = new Image(); im.crossOrigin = "anonymous"; im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
+  catch{ return loadImage(src); }
+}
+
+/* ---------- IA gratuite sur l'appareil (ONNX Runtime Web) ----------
+   Détourage : u2netp (4,6 Mo, Apache 2.0), hébergé avec l'app.
+   Type de vêtement : Marqo-FashionSigLIP, encodeur d'image (61 Mo, Apache 2.0), comparé à des descriptions
+   de types précalculées (ai/labels.json). Rien n'est envoyé : tout tourne dans le navigateur. */
+const LAI = {
+  ORT:"https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/+esm", WASM:"https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/",
+  SEG:"ai/u2netp.onnx", VIS:"https://huggingface.co/Marqo/marqo-fashionSigLIP/resolve/main/onnx/vision_model_q4.onnx", LABELS:"ai/labels.json", CACHE:"cintre-ai-v1"
+};
+const lai = { on: LS.get("cintre.lai") === true, asked: LS.get("cintre.lai.asked") === true, ort:null, seg:null, vis:null, types:null, segP:null, visP:null, pct:0, ready:false, err:"" };
+const TYPE_CAT = Object.fromEntries(Object.entries(CATS).flatMap(([c, v]) => v.types.map(t => [t, c])));
+async function fetchModel(url, onPct){
+  let c = null;
+  try{ c = await caches.open(LAI.CACHE); const hit = await c.match(url); if(hit) return new Uint8Array(await hit.arrayBuffer()); }catch{}
+  const r = await fetch(url); if(!r.ok) throw new Error("HTTP " + r.status);
+  const total = +r.headers.get("content-length") || 0, reader = r.body.getReader(), parts = []; let got = 0;
+  for(;;){ const {done, value} = await reader.read(); if(done) break; parts.push(value); got += value.length; if(total && onPct) onPct(Math.min(1, got/total)); }
+  const buf = new Uint8Array(got); let o = 0; for(const p of parts){ buf.set(p, o); o += p.length; }
+  try{ if(c) await c.put(url, new Response(buf, {headers:{"content-type":"application/octet-stream"}})); }catch{}
+  return buf;
+}
+async function laiOrt(){ if(!lai.ort){ const ort = await import(LAI.ORT); ort.env.wasm.wasmPaths = LAI.WASM; ort.env.wasm.numThreads = 1; lai.ort = ort; } return lai.ort; }
+function laiSeg(){
+  return lai.segP || (lai.segP = (async () => { const ort = await laiOrt(); lai.seg = await ort.InferenceSession.create(await fetchModel(LAI.SEG), {executionProviders:["wasm"]}); return lai.seg; })()
+    .catch(e => { lai.segP = null; lai.err = "Le détourage IA n'a pas pu se charger (connexion ?)."; throw e; }));
+}
+function laiVis(){
+  return lai.visP || (lai.visP = (async () => {
+    const ort = await laiOrt();
+    const [buf, L] = await Promise.all([fetchModel(LAI.VIS, p => { lai.pct = p; paintLai(); }), fetch(LAI.LABELS).then(r => r.json())]);
+    const dec = o => { const b = atob(o.b), a = new Float32Array(b.length); for(let i = 0; i < b.length; i++){ let x = b.charCodeAt(i); if(x > 127) x -= 256; a[i] = x*o.s; } return a; };
+    lai.types = Object.entries(L.types).map(([k, o]) => [k, dec(o)]);
+    lai.vis = await ort.InferenceSession.create(buf, {executionProviders:["wasm"]});
+    lai.pct = 1; lai.ready = true; paintLai(); return lai.vis;
+  })().catch(e => { lai.visP = null; lai.err = "La reconnaissance n'a pas pu se charger (connexion ?)."; paintLai(); throw e; }));
+}
+function paintLai(){ document.querySelectorAll(".js-lai").forEach(el => el.innerHTML = laiStatus()); }
+function laiStatus(){
+  if(!lai.on) return "Désactivée.";
+  if(lai.ready) return "Prête : détourage et reconnaissance du type fonctionnent sur cet appareil.";
+  if(lai.visP) return `Téléchargement du modèle de reconnaissance… ${Math.round(lai.pct*100)} %`;
+  return lai.err || "Activée : les modèles se chargent à la prochaine photo (téléchargés une seule fois, puis gardés sur l'appareil).";
+}
+function laiEnable(on){
+  lai.on = on; lai.asked = true; LS.set("cintre.lai", on); LS.set("cintre.lai.asked", true);
+  if(on){ laiSeg().catch(()=>{}); laiVis().catch(()=>{}); }
+}
+/* Masque de détourage IA, à la taille de l'image préparée pour l'éditeur (c = cutPrepare) */
+async function laiMask(c){
+  const ort = await laiOrt(), sess = await laiSeg(), S = 320;
+  const src = document.createElement("canvas"); src.width = c.W; src.height = c.H; const id = src.getContext("2d").createImageData(c.W, c.H); id.data.set(c.data); src.getContext("2d").putImageData(id, 0, 0);
+  const cv = document.createElement("canvas"); cv.width = cv.height = S; const g = cv.getContext("2d"); g.drawImage(src, 0, 0, S, S);
+  const px = g.getImageData(0, 0, S, S).data; let mx = 1; for(let i = 0; i < px.length; i += 4) mx = Math.max(mx, px[i], px[i+1], px[i+2]);
+  const mean = [.485, .456, .406], sd = [.229, .224, .225], f = new Float32Array(3*S*S);
+  for(let i = 0; i < S*S; i++) for(let k = 0; k < 3; k++) f[k*S*S + i] = (px[i*4 + k]/mx - mean[k])/sd[k];
+  const out = await sess.run({[sess.inputNames[0]]: new ort.Tensor("float32", f, [1, 3, S, S])});
+  const m = out[sess.outputNames[0]].data; let lo = Infinity, hi = -Infinity; for(const v of m){ if(v < lo) lo = v; if(v > hi) hi = v; }
+  const mc = document.createElement("canvas"); mc.width = mc.height = S; const mg = mc.getContext("2d"), mi = mg.createImageData(S, S);
+  for(let i = 0; i < S*S; i++){ const v = Math.round((m[i]-lo)/(hi-lo || 1)*255); mi.data[i*4] = v; mi.data[i*4+3] = 255; }
+  mg.putImageData(mi, 0, 0);
+  const up = document.createElement("canvas"); up.width = c.W; up.height = c.H; const ug = up.getContext("2d"); ug.imageSmoothingQuality = "high"; ug.drawImage(mc, 0, 0, c.W, c.H);
+  const ud = ug.getImageData(0, 0, c.W, c.H).data, mask = new Uint8Array(c.W*c.H);
+  for(let i = 0; i < mask.length; i++) mask[i] = ud[i*4] > 127 ? 1 : 0;
+  cleanMask(mask, c.W, c.H);
+  return mask;
+}
+/* Types les plus probables pour une photo (idéalement détourée, sur fond blanc) */
+async function laiClassify(src){
+  const ort = await laiOrt(), sess = await laiVis(), S = 224;
+  const im = typeof src === "string" ? await loadImageAny(src) : src;
+  const cv = document.createElement("canvas"); cv.width = cv.height = S; const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, S, S); g.drawImage(im, 0, 0, S, S);
+  const px = g.getImageData(0, 0, S, S).data, f = new Float32Array(3*S*S);
+  for(let i = 0; i < S*S; i++) for(let k = 0; k < 3; k++) f[k*S*S + i] = (px[i*4 + k]/255 - .5)/.5;
+  const out = await sess.run({[sess.inputNames[0]]: new ort.Tensor("float32", f, [1, 3, S, S])});
+  const v = (out.image_embeds || out[sess.outputNames[0]]).data; let n = 0; for(const x of v) n += x*x; n = Math.sqrt(n) || 1;
+  return lai.types.map(([k, e]) => { let s = 0; for(let i = 0; i < e.length; i++) s += e[i]*v[i]; return [k, s/n]; }).sort((a, b) => b[1]-a[1]).slice(0, 4).map(([t]) => t);
+}
+const WARM3 = ["Doudoune", "Manteau"], WARM2 = ["Pull", "Sweat", "Hoodie", "Veste", "Blouson", "Blazer", "Surchemise", "Bottines", "Bonnet", "Écharpe", "Jean"];
+const warmthFor = t => WARM3.includes(t) ? 3 : WARM2.includes(t) ? 2 : 1;
+const seasonsFor = t => WARM3.includes(t) || ["Bonnet", "Écharpe"].includes(t) ? ["automne", "hiver"] : ["Short", "Débardeur", "Sandales"].includes(t) ? ["printemps", "été"] : [];
+function applyType(it, t){ it.type = t; it.category = TYPE_CAT[t] || it.category; it.warmth = warmthFor(t); if(!(it.seasons||[]).length || it.autoSeasons){ it.seasons = seasonsFor(t); it.autoSeasons = true; } }
+/* Après une photo : reconnaissance du type si l'IA est activée et que Claude ne s'en charge pas */
+async function laiTagItem(s){
+  if(!lai.on || (store.ai && store.aiImages) || !s.item.photo) return;
+  s.laiBusy = true; if(modal.state === s) modal.paint();
+  try{
+    const top = await laiClassify(photoSrc(s.item.photo));
+    if(modal.state !== s) return;
+    if(s.wish) readWishFields(s); else readEditFields(s);
+    s.suggest = top; if(!s.catTouched) applyType(s.item, top[0]);
+    s.aiNote = `Reconnu : ${top[0]}. Pas ça ? Touche une autre suggestion ou choisis le type.`;
+  }catch{ s.aiNote = "Reconnaissance indisponible pour l'instant : choisis le type."; }
+  s.laiBusy = false; if(modal.state === s) modal.paint();
+}
+
+/* ---------- Partage d'une tenue en image ---------- */
+async function outfitImage(o){
+  const its = outfitItems(o), W = 1080, H = 1350, P = 60, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const g = cv.getContext("2d"); g.fillStyle = "#F6F6F4"; g.fillRect(0, 0, W, H);
+  const by = c => its.find(i => i.category === c), side = by("couche") || by("accessoire");
+  const mainW = side ? (W - 3*P)*0.62 : W - 2*P, sideX = P*2 + mainW, sideW = W - sideX - P, top = P, bottom = H - 190;
+  const rows = by("robe") ? [[by("robe"), 2], [by("chaussures"), .8]] : [[by("haut"), 1], [by("bas"), 1], [by("chaussures"), .7]];
+  const list = rows.filter(r => r[0]), tot = list.reduce((a, r) => a + r[1], 0) || 1, boxes = [];
+  let y = top; for(const [i, w] of list){ const h = (bottom - top - (list.length-1)*20)*w/tot; boxes.push([i, P, y, mainW, h]); y += h + 20; }
+  if(side){ const s2 = [by("couche"), by("accessoire")].filter(Boolean); const h = (bottom - top - 20)/2; s2.forEach((i, k) => boxes.push([i, sideX, top + k*(h + 20), sideW, h])); }
+  for(const [i, x, yy, w, h] of boxes){
+    g.fillStyle = "#FFFFFF"; g.beginPath(); g.roundRect(x, yy, w, h, 28); g.fill();
+    let im = null;
+    if(i.photo){ try{ im = await loadImageAny(photoSrc(i.photo)); }catch{} }
+    if(!im){ try{ im = await loadImage("data:image/svg+xml;charset=utf-8," + encodeURIComponent(illo(i).replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" '))); }catch{} }
+    if(im){ const k = Math.min((w-40)/im.naturalWidth, (h-40)/im.naturalHeight); const dw = im.naturalWidth*k, dh = im.naturalHeight*k; g.drawImage(im, x + (w-dw)/2, yy + (h-dh)/2, dw, dh); }
+  }
+  g.fillStyle = "#0B0B0F"; g.font = "700 54px Geist, system-ui, sans-serif"; g.fillText(o.name || "Ma tenue", P, H - 105);
+  g.fillStyle = "#6B6B73"; g.font = "500 30px Geist, system-ui, sans-serif"; g.fillText([OCCASIONS[o.occasion]?.label, its.map(i => i.name).slice(0, 3).join(" · ")].filter(Boolean).join("  —  ").slice(0, 70), P, H - 60);
+  g.fillStyle = "#4F46E5"; g.font = "800 34px Geist, system-ui, sans-serif"; g.textAlign = "right"; g.fillText("Cintre.", W - P, H - 105);
+  return await new Promise((res, rej) => { try{ cv.toBlob(b => b ? res(b) : rej(new Error("toBlob")), "image/jpeg", .9); }catch(e){ rej(e); } });
+}
+async function shareOutfit(o){
+  toast("Préparation de l'image…");
+  let blob; try{ blob = await outfitImage(o); }catch{ toast("Impossible de créer l'image (une photo vient d'un site qui l'interdit)."); return; }
+  const file = new File([blob], `${(o.name || "tenue").replace(/[^\w\- ]+/g, "").trim() || "tenue"}.jpg`, {type:"image/jpeg"});
+  if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file], title:o.name || "Ma tenue"}); return; }catch(e){ if(e && e.name === "AbortError") return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast("Image enregistrée.");
+}
+
+/* ---------- Annuler une suppression ---------- */
+let toastUndo = null;
+const snapshot = ids => ids.map(findDoc).filter(Boolean).map(d => JSON.parse(JSON.stringify(d)));
+function undoable(msg, snap){ toast(msg, async () => { await saveMany(snap); toast("C'est restauré."); }); }
+
+/* ---------- Préférences et démarrage guidé ---------- */
+const prefs = LS.get("cintre.prefs", {}) || {};
+function savePrefs(){ LS.set("cintre.prefs", prefs); }
+function defaultOcc(){ const m = LS.get("cintre.occday", {}) || {}; return m[new Date().getDay()] || (prefs.occs && prefs.occs[0]) || "cours"; }
+function onboardBlock(){
+  const n = items().length;
+  if(n >= 15 || prefs.hideProgress) return "";
+  if(!prefs.occs){
+    const sel = prefs.draft || [];
+    return `<div class="panel stack onboard"><div class="row" style="justify-content:space-between"><span class="eyebrow">Pour bien démarrer · 1 / 3</span><button class="linkmore" data-act="ob-skip">Passer</button></div>
+      <h2 style="font-size:24px">Pour quoi t'habilles-tu le plus ?</h2><p class="muted" style="margin:0">La tenue du jour partira de ces occasions. Tu pourras les changer à tout moment.</p>
+      <div class="chips">${Object.entries(OCCASIONS).map(([k, v]) => `<button class="chip" data-act="ob-occ" data-v="${k}" aria-pressed="${sel.includes(k)}">${v.label}</button>`).join("")}</div>
+      <button class="btn primary" data-act="ob-next" ${sel.length ? "" : "disabled"}>Continuer</button></div>`;
+  }
+  if(n < 5) return `<div class="panel stack onboard"><div class="row" style="justify-content:space-between"><span class="eyebrow">Pour bien démarrer · 2 / 3</span><span class="mono">${n} / 5</span></div>
+      <h2 style="font-size:24px">Ajoute tes 5 pièces les plus portées</h2><p class="muted" style="margin:0">Un haut, un bas, des chaussures suffisent pour ta première tenue du jour. Photo après photo, sans revenir en arrière.</p>
+      <div class="bar"><i style="width:${n/5*100}%"></i></div>
+      <div class="row"><label class="btn primary">${ICONS.camera}Prendre en photo<input class="vh" type="file" id="file-one-cam" accept="image/*" capture="environment"></label><label class="btn">Galerie<input class="vh" type="file" id="file-one" accept="image/*"></label><button class="btn" data-act="library" data-v="own">${ICONS.search}Bibliothèque</button></div>
+      ${n ? "" : `<button class="linkmore" data-act="demo" style="align-self:flex-start">Ou explorer avec une garde-robe d'exemple</button>`}</div>`;
+  return `<div class="panel stack onboard"><div class="row" style="justify-content:space-between"><span class="eyebrow">${baseCombos().length ? "Ta garde-robe prend forme" : "Pour bien démarrer · 3 / 3"}</span><button class="linkmore" data-act="ob-hide">Masquer</button></div>
+      <div class="row" style="justify-content:space-between"><b>${n} / 15 pièces</b><span class="muted" style="font-size:13px">${baseCombos().length} tenue${baseCombos().length > 1 ? "s" : ""} possible${baseCombos().length > 1 ? "s" : ""}</span></div>
+      <div class="bar"><i style="width:${n/15*100}%"></i></div>
+      <p class="muted" style="margin:0;font-size:13px">${baseCombos().length ? "À 15 pièces, les suggestions deviennent vraiment variées. Continue en rafale :" : "Il manque encore un haut, un bas ou des chaussures pour composer une tenue :"}</p>
+      <div class="row"><label class="btn sm primary">${ICONS.camera}Photo<input class="vh" type="file" id="file-one-cam" accept="image/*" capture="environment"></label><label class="btn sm">Galerie<input class="vh" type="file" id="file-one" accept="image/*"></label><button class="btn sm" data-act="library" data-v="own">Bibliothèque</button></div></div>`;
+}
+function flatlay(its){
+  const by = c => its.find(i => i.category === c), robe = by("robe"), co = by("couche"), ac = by("accessoire");
+  const cell = (i, a) => i ? `<div class="fl-${a}">${thumb(i)}</div>` : "";
+  return `<div class="flat ${co || ac ? "" : "solo"}">${robe ? cell(robe, "robe") : cell(by("haut"), "haut") + cell(by("bas"), "bas")}${cell(by("chaussures"), "chaus")}${cell(co, "couche")}${cell(ac, "acc")}</div>`;
 }
 
 /* ---------- Navigation ---------- */
@@ -1853,15 +2152,14 @@ function pieceCard(i, ws){
 
 function outfitCard(o){
   const its = outfitItems(o);
-  const main = its.filter(i=>i.category!=="accessoire").slice(0,4);
   return `<div class="outfit">
-    <button data-act="outfit" data-id="${o.id}" style="all:unset;cursor:pointer;display:block"><div class="collage ${main.length===3?"n3":""}">${main.map(thumb).join("")}</div></button>
+    <button data-act="outfit" data-id="${o.id}" style="all:unset;cursor:pointer;display:block" aria-label="Modifier ${esc(o.name)}">${flatlay(its)}</button>
     <div class="row" style="justify-content:space-between;flex-wrap:nowrap">
       <h3 style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(o.name)}</h3>
-      <button class="btn ghost sm fav" data-act="fav" data-id="${o.id}" aria-label="${o.fav?"Retirer des favoris":"Ajouter aux favoris"}">${o.fav?ICONS.star:ICONS.starO}</button>
+      <div class="row" style="flex-wrap:nowrap;gap:0"><button class="btn ghost sm fav" data-act="o-share" data-id="${o.id}" aria-label="Partager en image">${ICONS.share}</button><button class="btn ghost sm fav" data-act="fav" data-id="${o.id}" aria-label="${o.fav?"Retirer des favoris":"Ajouter aux favoris"}">${o.fav?ICONS.star:ICONS.starO}</button></div>
     </div>
     <div class="tags">${isWishOutfit(o)?`<span class="tagl" style="background:var(--accent-soft);color:var(--accent)">Avec ${(o.itemIds||[]).filter(id=>DB.wish.has(id)).length} envie(s)</span>`:""}${o.occasion?`<span class="tagl">${OCCASIONS[o.occasion]?.label||""}</span>`:""}${(o.seasons||[]).map(s=>`<span class="tagl">${SEASONS[s]}</span>`).join("")}${o.demo?`<span class="tagl">Exemple</span>`:""}</div>
-    ${isWishOutfit(o)?`<button class="btn sm" data-act="outfit" data-id="${o.id}">Modifier</button>`:`<button class="btn sm" data-act="wear-outfit" data-id="${o.id}">Je la porte aujourd'hui</button>`}
+    ${isWishOutfit(o)?`<button class="btn sm" data-act="outfit" data-id="${o.id}">Modifier</button>`:`<button class="btn sm" data-act="wear-outfit" data-id="${o.id}">Je la porte</button>`}
   </div>`;
 }
 function viewTenues(){
@@ -1980,6 +2278,10 @@ function shopPanel(){
 function mSettings(){
   const k = getKey();
   return sheetHead("Réglages") + `
+    <div class="field"><span class="lab">IA gratuite sur l'appareil</span>
+      <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><span class="muted js-lai" style="font-size:13px">${laiStatus()}</span>${lai.on ? `<button class="btn sm" data-act="lai-off">Désactiver</button>` : `<button class="btn sm primary" data-act="lai-yes">Activer</button>`}</div>
+      <span class="muted" style="font-size:13px">Détourage précis et reconnaissance du type de vêtement, sans compte ni coût : les modèles tournent sur ton téléphone et tes photos n'en sortent pas. Téléchargement unique d'environ 65 Mo (Wi-Fi conseillé). Modèles : U²-Net (détourage) et Marqo-FashionSigLIP (mode), licence Apache 2.0.</span>
+      ${lai.on ? `<button class="linkmore" data-act="lai-clear" style="align-self:flex-start">Supprimer les modèles de cet appareil</button>` : ""}</div>
     <div class="field"><label for="set-key">Clé API Claude (facultative)</label><input class="input" id="set-key" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(k)}">
     <span class="muted" style="font-size:13px">Active les tags automatiques, le scan en lot, l'avis de styliste, les annonces et la recherche en boutique. Crée une clé sur console.anthropic.com (facturation à l'usage, quelques centimes par photo ou recherche). La clé reste dans ce navigateur et n'est envoyée qu'à l'API Claude. Ne l'utilise que sur ton propre appareil.</span></div>
     <div class="row" style="margin-bottom:18px">${k?`<button class="btn sm danger" data-act="key-del">Retirer la clé</button>`:""}<span class="muted" style="font-size:13px">${k?"Clé enregistrée.":"Aucune clé enregistrée."}</span></div>
@@ -2014,13 +2316,15 @@ function render(){
 
 /* ---------- Modales ---------- */
 const modal = { render:null, state:{},
-  open(fn, state={}){ this.render = fn; this.state = state; this.paint(); },
+  open(fn, state={}){ const was = this.render; this.render = fn; this.state = state; if(was){ const sh = $("#modal .sheet"); if(sh) sh.scrollTop = 0; } this.paint(); },
   paint(){ if(this.painting) return; this.painting = true; try{ this._paint(); } finally { this.painting = false; } },
   _paint(){ const el=$("#modal"); if(!this.render){ el.innerHTML=""; return; }
     const keep = el.querySelector(".sheet")?.scrollTop || 0;
     const act = document.activeElement, aid = act && act.id && el.contains(act) && /^(INPUT|TEXTAREA)$/.test(act.tagName) ? act.id : null;
     let caret = null; try{ caret = aid ? act.selectionStart : null; }catch{}
-    el.innerHTML = `<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${this.render(this.state)}</div></div>`;
+    const open = el.querySelector(".sheet");
+    if(open) open.innerHTML = this.render(this.state);
+    else el.innerHTML = `<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${this.render(this.state)}</div></div>`;
     el.querySelector(".sheet").scrollTop = keep;
     if(aid){ const n = document.getElementById(aid); if(n){ n.focus({preventScroll:true}); try{ if(caret!=null) n.setSelectionRange(caret,caret); }catch{} } }
     if(this.render===mCut) cutDraw(); },
@@ -2045,31 +2349,41 @@ function mAdd(){
 function chipsField(name, opts, sel, multi=true){
   return `<div class="chips">${Object.entries(opts).map(([k,l])=>`<button type="button" class="chip" data-act="ed-chip" data-f="${name}" data-v="${k}" data-multi="${multi}" aria-pressed="${multi?(sel||[]).includes(k):sel===k}">${name==="colors"?`<span class="dot" style="background:${COLORS[k]}"></span>`:""}${l}</button>`).join("")}</div>`;
 }
+function typeTiles(it, s){
+  const c = it.category, col = (it.colors||[])[0] || "gris";
+  const sug = (s.suggest||[]).filter(t => TYPE_CAT[t]);
+  return `${sug.length ? `<div class="sugg"><span class="mono">${ICONS.spark} Suggestions</span>${sug.slice(0,3).map(t => `<button class="chip" data-act="ed-ptype" data-v="${esc(t)}" aria-pressed="${it.type===t}">${t}</button>`).join("")}</div>` : ""}
+    <div class="filters" style="margin-bottom:6px">${Object.entries(CATS).map(([k,v]) => `<button class="chip" data-act="ed-pcat" data-v="${k}" aria-pressed="${c===k}">${v.label}</button>`).join("")}</div>
+    <div class="tgrid">${CATS[c].types.map(t => `<button data-act="ed-ptype" data-v="${esc(t)}" aria-pressed="${it.type===t}">${illo({type:t, colors:[col]})}<span>${t}</span></button>`).join("")}</div>`;
+}
 function mEdit(s){
-  const it = s.item;
-  return sheetHead(s.isNew ? "Nouvelle pièce" : "Modifier la pièce") + `
-    <div class="row" style="align-items:flex-start;flex-wrap:nowrap;gap:14px;margin-bottom:14px">
-      <div style="width:120px;flex:none">${thumb(it)}</div>
-      <div style="flex:1;min-width:0">${s.busy?`<p class="row muted" style="margin:0"><span class="spinner"></span> Claude analyse la photo…</p>`:s.aiNote?`<p class="muted" style="margin:0;font-size:13px">${esc(s.aiNote)}</p>`:""}
-        <div class="row" style="margin-top:8px">${it.photo&&!s.busy?`<button class="btn sm" data-act="ed-cut">Détourer</button>`:""}${it.photo&&store.ai&&store.aiImages&&!s.busy?`<button class="btn sm" data-act="ed-retag">${ICONS.spark}Relancer l'analyse</button>`:""}</div></div>
+  const it = s.item, ai = store.ai && store.aiImages;
+  const busy = s.busy || s.laiBusy;
+  const auto = `${it.type}${it.colors && it.colors[0] ? " " + COLOR_LABEL[it.colors[0]].toLowerCase() : ""}`;
+  return sheetHead(s.isNew ? (s.count ? `Pièce n° ${s.count + 1}` : "Nouvelle pièce") : "Modifier la pièce") + `
+    <div class="row" style="align-items:flex-start;flex-wrap:nowrap;gap:14px;margin-bottom:16px">
+      <div style="width:110px;flex:none">${thumb(it)}</div>
+      <div style="flex:1;min-width:0">${busy ? `<p class="row muted" style="margin:0;font-size:13px"><span class="spinner"></span> ${s.busy ? "Claude analyse la photo…" : "Reconnaissance du vêtement…"}</p>` : s.aiNote ? `<p class="muted" style="margin:0;font-size:13px">${esc(s.aiNote)}</p>` : ""}
+        <div class="row" style="margin-top:8px">${it.photo && !busy ? `<button class="btn sm" data-act="ed-cut">Détourer</button>` : ""}${it.photo && ai && !busy ? `<button class="btn sm" data-act="ed-retag">${ICONS.spark}Relancer</button>` : ""}</div></div>
     </div>
-    ${findBlock(s)}
-    <div class="field"><label for="ed-name">Nom</label><input class="input" id="ed-name" value="${esc(it.name)}" placeholder="Ex. Chemise Oxford bleue"></div>
-    <div class="field"><label for="ed-brand">Marque</label><input class="input" id="ed-brand" value="${esc(it.brand)}"></div>
-    <div class="two"><div class="field"><label for="ed-size">Taille</label><input class="input" id="ed-size" value="${esc(it.size)}" placeholder="M, 42…"></div>
-      <div class="field"><label for="ed-price">Prix payé (€)</label><input class="input" id="ed-price" inputmode="decimal" value="${it.price!=null&&it.price!==""?String(it.price).replace(".", ","):""}" placeholder="49,90"></div></div>
-    <div class="two"><div class="field"><label for="ed-cat">Catégorie</label><select class="input" id="ed-cat">${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${it.category===k?"selected":""}>${v.one}</option>`).join("")}</select></div>
-      <div class="field"><label for="ed-type">Type</label><select class="input" id="ed-type">${CATS[it.category].types.map(t=>`<option ${it.type===t?"selected":""}>${t}</option>`).join("")}</select></div></div>
+    <div class="field"><span class="lab">Type</span>${typeTiles(it, s)}</div>
     <div class="field"><span class="lab">Couleurs (la première est la dominante)</span>${chipsField("colors", COLOR_LABEL, it.colors)}</div>
-    <div class="field"><span class="lab">Saisons</span>${chipsField("seasons", SEASONS, it.seasons)}</div>
-    <div class="field"><span class="lab">Styles</span>${chipsField("styles", STYLES, it.styles)}</div>
-    <div class="two"><div class="field"><label for="ed-mat">Matière</label><input class="input" id="ed-mat" value="${esc(it.material)}"></div>
-      <div class="field"><label for="ed-warm">Chaleur</label><select class="input" id="ed-warm">${[[1,"Légère"],[2,"Moyenne"],[3,"Chaude"]].map(([v,l])=>`<option value="${v}" ${+it.warmth===v?"selected":""}>${l}</option>`).join("")}</select></div></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn" data-act="close">Annuler</button><button class="btn primary" data-act="ed-save" ${s.busy?"disabled":""}>Enregistrer</button></div>`;
+    <div class="field"><label for="ed-name">Nom <span class="muted" style="font-weight:400">(facultatif)</span></label><input class="input" id="ed-name" value="${esc(it.name)}" placeholder="${esc(auto)}"></div>
+    <details class="more" data-k="moreOpen" ${s.moreOpen ? "open" : ""}><summary>Plus de détails <span class="muted">marque, taille, prix, saisons, style</span></summary>
+      <div class="field"><label for="ed-brand">Marque</label><input class="input" id="ed-brand" value="${esc(it.brand)}"></div>
+      <div class="two"><div class="field"><label for="ed-size">Taille</label><input class="input" id="ed-size" value="${esc(it.size)}" placeholder="M, 42…"></div>
+        <div class="field"><label for="ed-price">Prix payé (€)</label><input class="input" id="ed-price" inputmode="decimal" value="${it.price!=null&&it.price!==""?String(it.price).replace(".", ","):""}" placeholder="49,90"></div></div>
+      <div class="field"><span class="lab">Saisons <span class="muted" style="font-weight:400">(aucune = toutes)</span></span>${chipsField("seasons", SEASONS, it.seasons)}</div>
+      <div class="field"><span class="lab">Styles</span>${chipsField("styles", STYLES, it.styles)}</div>
+      <div class="two"><div class="field"><label for="ed-mat">Matière</label><input class="input" id="ed-mat" value="${esc(it.material)}"></div>
+        <div class="field"><label for="ed-warm">Chaleur</label><select class="input" id="ed-warm">${[[1,"Légère"],[2,"Moyenne"],[3,"Chaude"]].map(([v,l])=>`<option value="${v}" ${+it.warmth===v?"selected":""}>${l}</option>`).join("")}</select></div></div>
+    </details>
+    <details class="more" data-k="findOpen" ${s.findOpen || s.linkMsg || s.webPhoto ? "open" : ""}><summary>Retrouver la pièce en ligne <span class="muted">photo du site, nom, prix</span></summary>${findBlock(s)}</details>
+    <div class="row edit-actions"><button class="btn" data-act="close">Annuler</button><button class="btn ${s.isNew && s.src ? "" : "primary"}" data-act="ed-save" ${busy?"disabled":""}>Enregistrer</button>${s.isNew && s.src ? `<button class="btn primary" data-act="ed-save-next" ${busy?"disabled":""}>${ICONS.camera}Enregistrer et suivante</button>` : ""}</div>`;
 }
 function readEditFields(s){
   const g = id => $("#"+id)?.value ?? "";
-  Object.assign(s.item, {url:(g("ed-url")||s.item.url||"").trim(), name:g("ed-name").trim(), brand:g("ed-brand").trim(), size:g("ed-size").trim(), price:parsePrice(g("ed-price")), material:g("ed-mat").trim(), warmth:+g("ed-warm")||1, category:g("ed-cat")||s.item.category, type:g("ed-type")||s.item.type});
+  Object.assign(s.item, {url:(g("ed-url")||s.item.url||"").trim(), name:g("ed-name").trim(), brand:g("ed-brand").trim(), size:g("ed-size").trim(), price:parsePrice(g("ed-price")), material:g("ed-mat").trim(), warmth:+g("ed-warm")||s.item.warmth||1});
 }
 function newItem(extra={}){ return {kind:"item", id:uid("item"), name:"", brand:"", size:"", category:"haut", type:"T-shirt", colors:[], seasons:[], styles:[], material:"", warmth:1, createdAt:new Date().toISOString(), ...extra}; }
 
@@ -2084,7 +2398,7 @@ function mItem(s){
       <dt>Styles</dt><dd>${(i.styles||[]).map(x=>STYLES[x]).join(", ")||"—"}</dd>${i.material?`<dt>Matière</dt><dd>${esc(i.material)}</dd>`:""}
       <dt>Porté</dt><dd>${w?`${w.count} fois, dernière le ${new Date(w.last+"T12:00").toLocaleDateString("fr-FR")}`:"jamais"}</dd>
       <dt>Tenues</dt><dd>${inOutfits.length?inOutfits.map(o=>esc(o.name)).join(", "):"aucune"}</dd></dl></div>
-    ${s.confirm?`<div class="confirm" style="margin-top:14px"><b>Supprimer « ${esc(i.name)} » ?</b><span class="muted" style="font-size:13px">Elle sera aussi retirée de ${inOutfits.length} tenue(s). Action définitive.</span><div class="row"><button class="btn sm" data-act="it-cancel">Garder</button><button class="btn sm danger" data-act="it-del-yes" data-id="${i.id}">Supprimer</button></div></div>`:""}
+    ${s.confirm?`<div class="confirm" style="margin-top:14px"><b>Supprimer « ${esc(i.name)} » ?</b><span class="muted" style="font-size:13px">Elle sera aussi retirée de ${inOutfits.length} tenue(s). Tu pourras annuler juste après.</span><div class="row"><button class="btn sm" data-act="it-cancel">Garder</button><button class="btn sm danger" data-act="it-del-yes" data-id="${i.id}">Supprimer</button></div></div>`:""}
     <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn ghost danger" data-act="it-del" data-id="${i.id}">Supprimer</button>
       <div class="row">${i.url?`<a class="btn" href="${esc(i.url)}" target="_blank" rel="noopener">Voir en ligne</a>`:""}${i.photo&&!/^https?:/.test(i.photo)?`<button class="btn" data-act="it-cut" data-id="${i.id}">Détourer</button>`:""}<button class="btn" data-act="it-wear" data-id="${i.id}">Portée aujourd'hui</button><button class="btn primary" data-act="it-edit" data-id="${i.id}">Modifier</button></div></div>`;
 }
@@ -2160,14 +2474,14 @@ async function analysePhoto(file, s){
   }catch(e){ s.aiNote = aiError(e) + " Remplis les champs à la main."; }
   s.busy = false; if(modal.state===s) modal.paint();
 }
-async function onPhotoOne(file){
+async function onPhotoOne(file, src){
   const im = await fileToImage(file).catch(()=>null);
   if(!im){ toast("Image illisible."); return; }
   openCut(im, ({photo, colors}) => {
     const ai = store.ai && store.aiImages;
-    const s = {item:newItem({photo, colors}), isNew:true, file, aiNote: ai ? "" : "Couleurs détectées sur la photo. Choisis la catégorie et le type, puis enregistre."};
+    const s = {item:newItem({photo, colors}), isNew:true, file, src, count: ui.burst || 0, aiNote: ai || lai.on ? "" : "Couleurs détectées sur la photo. Choisis le type, puis enregistre."};
     modal.open(mEdit, s);
-    if(ai) analysePhoto(file, s);
+    if(ai) analysePhoto(file, s); else laiTagItem(s);
   });
 }
 async function onBatch(file){
@@ -2251,6 +2565,7 @@ async function clearDemo(){
 }
 
 document.addEventListener("click", async e => {
+  if(e.target.id === "toast-undo"){ const f = toastUndo; toastUndo = null; $("#toast").hidden = true; if(f) f(); return; }
   const el = e.target.closest("[data-act]"); if(!el) return;
   const a = el.dataset.act, v = el.dataset.v, id = el.dataset.id, s = modal.state;
   if(a==="scrim"){ if(e.target===el) modal.close(); return; }
@@ -2269,13 +2584,25 @@ document.addEventListener("click", async e => {
     case "chat-clear": chat.list = []; LS.set(chatKey(), []); render(); break;
     case "w-cat": ui.wishCat = v; render(); break;
     case "cut-mode": s.mode = v; modal.paint(); break;
+    case "cut-method": if(s.c && s.method !== v){ s.undo.push(s.mask.slice()); s.method = v; cutRun(s); } break;
+    case "lai-yes": laiEnable(true); if(modal.render===mCut && s.c){ s.method = "ai"; cutRun(s); } else modal.paint(); toast("IA activée : téléchargement des modèles en cours."); break;
+    case "lai-no": laiEnable(false); modal.paint(); break;
+    case "lai-off": laiEnable(false); modal.paint(); toast("IA désactivée."); break;
+    case "lai-clear": { try{ await caches.delete(LAI.CACHE); }catch{} laiEnable(false); lai.seg = lai.vis = null; lai.segP = lai.visP = null; lai.ready = false; lai.pct = 0; modal.paint(); toast("Modèles supprimés de cet appareil."); break; }
+    case "ob-occ": { const d = prefs.draft || (prefs.draft = []); const k = d.indexOf(v); k >= 0 ? d.splice(k, 1) : d.push(v); render(); break; }
+    case "ob-next": prefs.occs = prefs.draft || []; delete prefs.draft; savePrefs(); ui.jour.occ = defaultOcc(); ui.jour.picks = null; render(); break;
+    case "ob-skip": prefs.occs = []; delete prefs.draft; savePrefs(); render(); break;
+    case "ob-hide": prefs.hideProgress = true; savePrefs(); render(); break;
+    case "acc-pw": { const pw = $("#acc-pw")?.value || ""; if(pw.length < 6){ toast("6 caractères minimum."); break; }
+      try{ const sb = await supa(); const {error} = await sb.auth.updateUser({password:pw}); if(error) throw error; $("#acc-pw").value = ""; toast("Mot de passe changé."); }
+      catch(e){ toast(isNetErr(e) ? "Pas de connexion à Internet." : "Changement refusé : " + String(e?.message||"erreur").slice(0,60)); } break; }
     case "cut-undo": if(s.undo.length){ s.mask = s.undo.pop(); cutDraw(); } break;
     case "cut-reset": if(s.c){ s.undo.push(s.mask.slice()); s.tol = 14; s.mask = autoMask(s.c, 14); modal.paint(); } break;
     case "cut-ok": { if(s.busy) break; const photo = cutExport(s.c, s.mask); if(!photo){ toast("La pièce a été presque entièrement effacée : restaure-la ou réinitialise."); break; } s.done({photo, colors:colorsFrom(s.c, s.mask)}); break; }
     case "cut-skip": s.done({photo:toDataURL(drawTo(s.im, 560)), colors:s.c ? colorsFrom(s.c, null) : []}); break;
-    case "ed-cut": { readEditFields(s); if(/^https?:/.test(s.item.photo||"")){ toast("La photo du site est déjà prête : pas besoin de la détourer."); break; } const back = s; const im = await loadImage(s.item.photo).catch(()=>null); if(!im) break;
+    case "ed-cut": { readEditFields(s); if(/^https?:/.test(s.item.photo||"")){ toast("La photo du site est déjà prête : pas besoin de la détourer."); break; } const back = s; const im = await loadImageAny(photoSrc(s.item.photo)).catch(()=>null); if(!im){ toast("Photo indisponible pour l'instant."); break; }
       openCut(im, r => { back.item.photo = r.photo; if(!(back.item.colors||[]).length) back.item.colors = r.colors; modal.open(mEdit, back); }); break; }
-    case "it-cut": { const i = DB.items.get(id); const im = await loadImage(i.photo).catch(()=>null); if(!im) break;
+    case "it-cut": { const i = DB.items.get(id); const im = await loadImageAny(photoSrc(i.photo)).catch(()=>null); if(!im){ toast("Photo indisponible pour l'instant."); break; }
       openCut(im, async r => { modal.close(); await put({...DB.items.get(id), photo:r.photo}); toast("Photo détourée."); }); break; }
     case "bz-undo": s.rects.pop(); modal.paint(); break;
     case "ed-link": itemFromLink(s); break;
@@ -2292,7 +2619,7 @@ document.addEventListener("click", async e => {
     case "wish-edit": { const w = DB.wish.get(id); if(w) modal.open(mWish, {wish:true, isNew:false, item:JSON.parse(JSON.stringify(w))}); break; }
     case "wi-link": wishFromLink(s); break;
     case "wi-nophoto": readWishFields(s); s.crop = null; s.noPhoto = true; modal.paint(); break;
-    case "wi-del": modal.close(); await replaceInOutfits(id, null); await del("wish", id); toast("Envie retirée."); break;
+    case "wi-del": { modal.close(); const snap = snapshot([id, ...[...DB.outfits.values()].filter(o=>(o.itemIds||[]).includes(id)).map(o=>o.id)]); await replaceInOutfits(id, null); await del("wish", id); undoable("Envie retirée.", snap); break; }
     case "wi-save": {
       readWishFields(s); const it = s.item;
       if(!it.name){ s.err = "Donne un nom à la pièce."; modal.paint(); break; }
@@ -2311,23 +2638,30 @@ document.addEventListener("click", async e => {
     case "cal-m": ui.calMonth = v; render(); break;
     case "day": modal.open(mDay, {date:v}); break;
     case "day-log": { const o = DB.outfits.get(id); await logWear(o.itemIds, o.id, s.date); toast("Noté dans le calendrier."); break; }
-    case "wear-del": await del("wear", id); break;
+    case "wear-del": { const snap = snapshot([id]); await del("wear", id); undoable("Jour retiré du calendrier.", snap); break; }
     case "item": modal.open(mItem, {id}); break;
     case "it-edit": { const i = DB.items.get(id); modal.open(mEdit, {item:JSON.parse(JSON.stringify(i)), isNew:false}); break; }
     case "it-del": s.confirm = true; modal.paint(); break;
     case "it-cancel": s.confirm = false; modal.paint(); break;
     case "it-del-yes": {
+      const snap = snapshot([id, ...[...DB.outfits.values()].filter(o=>(o.itemIds||[]).includes(id)).map(o=>o.id)]);
       for(const o of DB.outfits.values()) if((o.itemIds||[]).includes(id)) await put({...o, itemIds:o.itemIds.filter(x=>x!==id)});
-      modal.close(); ui.jour.picks = null; await del("item", id); toast("Pièce supprimée."); break; }
+      modal.close(); ui.jour.picks = null; await del("item", id); undoable("Pièce supprimée.", snap); break; }
     case "it-wear": await logWear([id]); toast("Noté pour aujourd'hui."); modal.paint(); break;
     case "manual": modal.open(mEdit, {item:newItem(), isNew:true}); break;
     case "ed-chip": { s.wish ? readWishFields(s) : readEditFields(s); const f = el.dataset.f; const arr = s.item[f] || (s.item[f]=[]); const k = arr.indexOf(v); k>=0 ? arr.splice(k,1) : arr.push(v); modal.paint(); break; }
     case "ed-retag": if(s.file) analysePhoto(s.file, s); else { s.aiNote = "Reprends la photo pour relancer l'analyse."; modal.paint(); } break;
-    case "ed-save": {
+    case "ed-save": case "ed-save-next": {
+      if(a==="ed-save-next") $("#file-rafale-" + (s.src || "gal")).click();
       readEditFields(s); const it = s.item;
       if(!it.name) it.name = `${it.type}${it.colors[0]?" "+COLOR_LABEL[it.colors[0]].toLowerCase():""}`;
       if(!it.colors.length) it.colors = ["gris"];
-      delete it.keep; modal.close(); ui.jour.picks = null; await put(it); toast(s.isNew?"Pièce ajoutée.":"Pièce mise à jour."); break; }
+      delete it.keep; delete it.autoSeasons; modal.close(); ui.jour.picks = null; await put(it);
+      if(a==="ed-save-next"){ ui.burst = (ui.burst||0) + 1; toast(`${ui.burst} pièce${ui.burst>1?"s":""} ajoutée${ui.burst>1?"s":""} dans cette série. Photo suivante…`); }
+      else { if(s.isNew && ui.burst) toast(`Série terminée : ${ui.burst + 1} pièces ajoutées.`); else toast(s.isNew?"Pièce ajoutée.":"Pièce mise à jour."); ui.burst = 0; }
+      break; }
+    case "ed-pcat": readEditFields(s); s.catTouched = true; s.item.category = v; applyType(s.item, CATS[v].types[0]); modal.paint(); break;
+    case "ed-ptype": readEditFields(s); s.catTouched = true; applyType(s.item, v); modal.paint(); break;
     case "library": modal.open(mLibrary, {target:v, q:""}); break;
     case "lib-clear": s.matches = null; modal.paint(); break;
     case "lib-pick": {
@@ -2336,7 +2670,7 @@ document.addEventListener("click", async e => {
       else { ui.jour.picks = null; await put({...newItem(), ...c, kind:"item", id:uid("item"), catalogId:c.id, createdAt:new Date().toISOString()}); }
       toast(`${c.name} ajouté${s.target==="wish"?" à tes envies":""}.`); break; }
     case "wish-add": { const c = CATALOG.find(x=>x.id===v); if([...DB.wish.values()].some(w=>w.catalogId===v)){ toast("Déjà dans tes envies."); break; } await put({...c, kind:"wish", id:uid("wish"), catalogId:c.id, createdAt:new Date().toISOString()}); toast("Ajouté à tes envies."); break; }
-    case "wish-del": await replaceInOutfits(id, null); await del("wish", id); break;
+    case "wish-del": { const snap = snapshot([id, ...[...DB.outfits.values()].filter(o=>(o.itemIds||[]).includes(id)).map(o=>o.id)]); await replaceInOutfits(id, null); await del("wish", id); undoable("Envie retirée.", snap); break; }
     case "wish-bought": { const w = DB.wish.get(id); const {kind, id:_, note, shop, url, ...rest} = w; const nid = uid("item");
       await put({...newItem(), ...rest, kind:"item", id:nid, demo:false, createdAt:new Date().toISOString()}); await replaceInOutfits(id, nid); await del("wish", id); ui.jour.picks = null; toast("Ajouté à ta garde-robe."); break; }
     case "new-outfit": modal.open(mOutfit, {sel:{}, seasons:[], withWish:v==="wish"}); break;
@@ -2350,11 +2684,12 @@ document.addEventListener("click", async e => {
       const prev = s.id ? DB.outfits.get(s.id) : null;
       const o = {kind:"outfit", id:s.id||uid("outfit"), name:s.name||"Tenue sans nom", itemIds:ids, occasion:s.occasion||null, seasons:s.seasons, fav:prev?.fav||false, createdAt:prev?.createdAt||new Date().toISOString()};
       modal.close(); await put(o); toast(isWishOutfit(o) ? "Look enregistré dans « Tenues avec tes envies »." : "Tenue enregistrée."); break; }
-    case "o-del": modal.close(); await del("outfit", id); toast("Tenue supprimée."); break;
+    case "o-del": { modal.close(); const snap = snapshot([id]); await del("outfit", id); undoable("Tenue supprimée.", snap); break; }
+    case "o-share": { const o = DB.outfits.get(id); if(o) shareOutfit(o); break; }
     case "fav": { const o = DB.outfits.get(id); await put({...o, fav:!o.fav}); break; }
     case "wear-outfit": { const o = DB.outfits.get(id); await logWear(o.itemIds, o.id); toast("Noté pour aujourd'hui."); break; }
     case "j-w": wx.manual = !!wx.data; ui.jour.weather = v; ui.jour.picks = null; ui.jour.idx = 0; ui.jour.ai=""; render(); break;
-    case "j-o": ui.jour.occ = v; ui.jour.picks = null; ui.jour.idx = 0; ui.jour.ai=""; render(); break;
+    case "j-o": { const m = LS.get("cintre.occday", {}) || {}; m[new Date().getDay()] = v; LS.set("cintre.occday", m); } ui.jour.occ = v; ui.jour.picks = null; ui.jour.idx = 0; ui.jour.ai=""; render(); break;
     case "j-go": ui.jour.picks = suggest(ui.jour); ui.jour.idx = 0; ui.jour.ai=""; render(); break;
     case "j-next": { const J = ui.jour; J.ai=""; if(J.idx < J.picks.length-1) J.idx++; else { J.picks = suggest(J); J.idx = 0; } render(); break; }
     case "j-wear": { const p = ui.jour.picks[ui.jour.idx]; await logWear(p.pieces.map(i=>i.id)); toast("Bonne journée ! Tenue notée dans le calendrier."); break; }
@@ -2383,7 +2718,8 @@ document.addEventListener("change", e => {
   const t = e.target, s = modal.state;
   if(t.type==="file" && t.files && t.files[0]){
     const f = t.files[0];
-    if(t.id.startsWith("file-one")) onPhotoOne(f);
+    if(t.id.startsWith("file-one")) onPhotoOne(f, t.id.endsWith("cam") ? "cam" : "gal");
+    else if(t.id.startsWith("file-rafale")) onPhotoOne(f, t.id.endsWith("cam") ? "cam" : "gal");
     else if(t.id.startsWith("file-batch")) (store.ai && store.aiImages ? onBatch(f) : onBatchManual(f));
     else if(t.id==="file-bman") onBatchManual(f);
     else if(t.id==="file-lib") onLibPhoto(f, s);
@@ -2398,8 +2734,7 @@ document.addEventListener("change", e => {
   else if(t.id==="j-rain"){ wx.manual = !!wx.data; ui.jour.rain = t.checked; ui.jour.picks = null; ui.jour.idx=0; render(); }
   else if(t.id==="wi-cat"){ readWishFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
   else if(t.id==="o-withwish"){ s.name = $("#o-name")?.value; s.withWish = t.checked; if(!t.checked) for(const k of Object.keys(s.sel)) if(DB.wish.has(s.sel[k])) s.sel[k] = null; modal.paint(); }
-  else if(t.id==="ed-name" && s.item && !s.catTouched && !(store.ai && store.aiImages)){ readEditFields(s); const g = guessFromText(s.item.name); if(g.category){ s.item.category = g.category; s.item.type = g.type; } if(g.colors && !(s.item.colors||[]).length) s.item.colors = g.colors; if(g.category || g.colors) modal.paint(); }
-  else if(t.id==="ed-type"){ s.catTouched = true; }
+  else if(t.id==="ed-name" && s.item && !s.catTouched && !(store.ai && store.aiImages)){ readEditFields(s); const g = guessFromText(s.item.name); if(g.type){ applyType(s.item, g.type); } if(g.colors && !(s.item.colors||[]).length) s.item.colors = g.colors; if(g.category || g.colors) modal.paint(); }
   else if(t.id==="ed-cat"){ s.catTouched = true; readEditFields(s); s.item.type = CATS[s.item.category].types[0]; modal.paint(); }
   else if(t.dataset.act==="b-tog"){ s.found[+t.dataset.v].keep = t.checked; modal.paint(); }
   else if(t.dataset.act==="b-cat"){ const f = s.found[+t.dataset.v]; f.category = t.value; f.type = CATS[t.value].types[0]; modal.paint(); }
@@ -2445,6 +2780,7 @@ async function importBackup(file){
   }catch{ toast("Ce fichier n'est pas une sauvegarde Cintre."); }
 }
 document.addEventListener("keydown", e => { if(e.key==="Escape" && modal.render) modal.close(); });
+document.addEventListener("toggle", e => { const d = e.target; if(d && d.dataset && d.dataset.k){ const st = d.closest("#modal") ? modal.state : prefs; if(st) st[d.dataset.k] = d.open; } }, true);
 document.addEventListener("click", e => { /* enregistrement du lot */
   const el = e.target.closest('[data-act="b-save"]'); if(!el) return;
   const s = modal.state; const keep = s.found.filter(f=>f.keep);
@@ -2458,6 +2794,7 @@ document.addEventListener("visibilitychange", () => { if(!document.hidden && sto
 
 (function boot(){
   const h = location.hash.slice(1); if(VIEWS[h]) ui.tab = h;
+  ui.jour.occ = defaultOcc();
   wxApply(); render(); initStore();
   if(wx.loc && wxStale()) wxFetch();
 })();
