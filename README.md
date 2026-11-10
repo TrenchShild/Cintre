@@ -23,6 +23,18 @@ Projet Supabase : `qogdwrfensailwsknnxc` (adresse et clé publique dans `CLOUD`,
 3. **Stocker les photos à part** (recommandé) : SQL Editor → coller `supabase/photos.sql` → Run. Les photos des comptes vont alors dans un espace privé (liens signés), au lieu d'alourdir les données : synchronisation plus rapide. Les photos existantes y sont déplacées automatiquement.
 4. **Activer la recherche par photo** (Google Lens) : SQL Editor → New query → coller le contenu de `supabase/storage.sql` → Run. Ça crée l'espace de stockage `lens`, avec une photo par compte, remplacée à chaque recherche.
 
+## Correspondances web (Google Shopping + eBay), gratuites
+
+La fiche d'une pièce propose « Correspondances sur le web » : des produits ressemblants trouvés sur Google Shopping (via Bright Data) et eBay France, à partir du type, de la couleur et de la marque. Les clés restent dans Supabase, jamais dans l'app. Chaque compte a 20 recherches par jour, et une recherche déjà faite (moins de 7 jours) est resservie depuis le cache sans rien consommer.
+
+1. **Quota et cache** : SQL Editor → coller `supabase/match.sql` → Run.
+2. **Bright Data (Google Shopping, 5 000 requêtes par mois offertes, sans carte)** : créer un compte sur brightdata.com → *Add* → *SERP API* → nommer la zone (par ex. `serp_cintre`) → dans l'onglet *Overview* de la zone, copier la clé API.
+3. **eBay (5 000 appels par jour offerts)** : créer un compte sur developer.ebay.com → *Application Keys* → créer un jeu de clés **Production** → copier *App ID (Client ID)* et *Cert ID (Client Secret)*. Si eBay demande la procédure « Marketplace Account Deletion », choisir l'exemption (l'app ne stocke aucune donnée d'utilisateur eBay).
+4. **Secrets** : Supabase → *Edge Functions* → *Secrets* → ajouter `BRIGHTDATA_API_KEY`, `BRIGHTDATA_ZONE`, `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` (et, si besoin, `MATCH_DAILY_LIMIT`).
+5. **Fonction** : *Edge Functions* → *Deploy a new function* → *Via Editor* → nom `match` → coller le contenu de `supabase/functions/match/index.ts` → *Deploy*.
+
+Un seul des deux fournisseurs suffit : sans ses secrets, il est ignoré.
+
 ## Maintenance
 
 Après une modification, augmente `VERSION` dans `sw.js` pour que les téléphones où l'app est installée reçoivent la nouvelle version.

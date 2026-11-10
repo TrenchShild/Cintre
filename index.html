@@ -399,6 +399,17 @@ details.more .panel{box-shadow:none}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .4s}
 .onboard h2{letter-spacing:-.035em}
 .toast-undo{background:none;border:0;color:var(--hero-accent);font-weight:700;margin-left:10px;padding:0}
+.mstrip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none;margin-top:10px}
+.mstrip::-webkit-scrollbar{display:none}
+.mcard{flex:none;width:136px;border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:14px;padding:6px;text-align:left;display:flex;flex-direction:column;gap:5px}
+.mcard[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--accent)}
+.mimg{position:relative;display:block;aspect-ratio:1;border-radius:10px;background:var(--swatch);overflow:hidden}
+.mimg img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.mbadge{position:absolute;left:4px;bottom:4px;background:var(--glass);font:600 10px/1 var(--f-body);padding:4px 6px;border-radius:999px}
+.mtitle{font-size:12px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:30px}
+.mmeta{display:flex;flex-direction:column;font-size:11.5px;color:var(--muted)}
+.mmeta b{color:var(--ink);font-size:13px}
+.field.match .lab{display:inline-flex;align-items:center;gap:6px}
 .pick-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
 .pick-strip button{flex:none;width:72px;height:90px;padding:0;border:0;border-radius:12px;overflow:hidden;background:var(--surface);display:grid;place-items:center}
 .pick-strip button[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--accent)}
@@ -2035,6 +2046,63 @@ function flatlay(its){
   return `<div class="flat ${co || ac ? "" : "solo"}">${robe ? cell(robe, "robe") : cell(by("haut"), "haut") + cell(by("bas"), "bas")}${cell(by("chaussures"), "chaus")}${cell(co, "couche")}${cell(ac, "acc")}</div>`;
 }
 
+/* ---------- Correspondances web (fonction Supabase « match » : Google Shopping + eBay) ---------- */
+function matchQuery(it){
+  const col = (it.colors||[])[0] ? COLOR_LABEL[it.colors[0]].toLowerCase() : "";
+  const base = (it.name || `${String(it.type||"").toLowerCase()} ${col}`).trim();
+  const brand = it.brand && it.brand !== "Générique" && !norm(base).includes(norm(it.brand)) ? it.brand : "";
+  return [brand, base].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+}
+function matchBlock(s){
+  if(store.mode !== "cloud") return "";
+  const m = s.match || {}, q = m.q != null ? m.q : matchQuery(s.item);
+  let body;
+  if(m.busy) body = `<p class="row muted" style="margin:0;font-size:13px"><span class="spinner"></span> Recherche sur Google Shopping et eBay…</p>`;
+  else if(m.err) body = `<p style="margin:0;font-size:13px;color:var(--bad)">${esc(m.err)}</p>`;
+  else if(m.results) body = m.results.length
+    ? `<div class="mstrip">${m.results.map((r, k) => `<button class="mcard" data-act="m-pick" data-v="${k}" aria-pressed="${m.picked===k}">
+        <span class="mimg">${r.image ? `<img src="${esc(r.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}${r.source==="ebay" ? `<span class="mbadge">eBay${/occasion|used|pre-owned/i.test(r.condition||"") ? " · occasion" : ""}</span>` : ""}</span>
+        <span class="mtitle">${esc(r.title)}</span>
+        <span class="mmeta"><b>${r.price!=null ? esc(fmtPrice(r.price)) : esc(r.priceText||"")}</b><span>${esc(r.shop||"")}</span></span></button>`).join("")}</div>
+       <p class="muted" style="margin:6px 0 0;font-size:12px">Touche le bon produit pour remplir la fiche.${m.quota ? ` ${m.quota.limit - m.quota.used} recherche${m.quota.limit - m.quota.used > 1 ? "s" : ""} restante${m.quota.limit - m.quota.used > 1 ? "s" : ""} aujourd'hui.` : ""}</p>`
+    : `<p class="muted" style="margin:0;font-size:13px">Aucun produit trouvé. Ajoute la marque ou précise le nom, puis relance.</p>`;
+  else body = `<p class="muted" style="margin:0;font-size:12.5px">Cherche ta pièce sur Google Shopping et eBay à partir du type, de la couleur et de la marque. Un produit choisi remplit la fiche et propose sa photo.</p>`;
+  const photo = m.picked != null && (s.webPhoto || m.photoBusy) ? `<div class="row" style="flex-wrap:nowrap;gap:12px;margin-top:10px">${m.photoBusy ? `<span class="spinner"></span><span class="muted" style="font-size:13px">Récupération de la photo…</span>` : `<div style="width:56px;flex:none">${thumb({photo:s.webPhoto})}</div>${s.item.photo===s.webPhoto ? `<span class="muted" style="font-size:13px">Photo du produit utilisée.</span>${s.ownPhoto?`<button class="btn sm ghost" data-act="ed-ownphoto">Reprendre ma photo</button>`:""}` : `<button class="btn sm" data-act="ed-webphoto">Utiliser la photo du produit</button>`}`}</div>` : "";
+  return `<div class="field match"><span class="lab">${ICONS.search.replace("<svg ", '<svg width="15" height="15" ')} Correspondances sur le web</span>
+    <form class="row" data-form="match" style="flex-wrap:nowrap"><input class="input" id="m-q" value="${esc(q)}" placeholder="Ex. hoodie zippé bleu marine Walk in Paris" enterkeyhint="search" style="flex:1;min-width:0"><button class="btn" type="submit" ${m.busy ? "disabled" : ""}>Chercher</button></form>
+    ${body}${photo}</div>`;
+}
+async function runMatch(s){
+  readEditFields(s);
+  const m = s.match = {q: ($("#m-q")?.value || matchQuery(s.item)).trim(), busy:true};
+  if(m.q.length < 3){ m.busy = false; m.err = "Précise un peu la pièce : type, couleur ou marque."; modal.paint(); return; }
+  modal.paint();
+  try{
+    const sb = await supa();
+    const {data, error} = await sb.functions.invoke("match", {body:{q:m.q}});
+    if(error){ let b = {}; try{ b = await error.context.json(); }catch{} throw {msg:b.message, status:error.context?.status, name:error.name}; }
+    m.results = Array.isArray(data?.results) ? data.results : []; m.quota = data?.quota || null;
+    if(!m.results.length && data?.providers && Object.values(data.providers).every(p => !p.ok)) m.err = "Les services de recherche n'ont pas répondu. Réessaie dans un instant.";
+  }catch(e){
+    m.err = e?.status === 404 ? "Correspondances pas encore activées : la fonction « match » n'est pas déployée sur Supabase." : (e?.msg || (
+      e?.name === "FunctionsFetchError" || isNetErr(e) ? "Pas de connexion à Internet, ou fonction « match » introuvable." : "Recherche impossible pour l'instant."));
+  }
+  m.busy = false; if(modal.state === s) modal.paint();
+}
+async function pickMatch(s, k){
+  readEditFields(s); const m = s.match, r = m && m.results && m.results[k]; if(!r) return;
+  const it = s.item;
+  it.name = r.title.split(/\s[|–—]\s/)[0].slice(0, 80); it.url = r.url;
+  if(r.price != null && (it.price == null || it.price === "")) it.price = r.price;
+  if(!it.brand && r.source === "google" && r.shop && norm(r.title).includes(norm(r.shop))) it.brand = r.shop;
+  const g = guessFromText(r.title); if(g.type && !s.catTouched) applyType(it, g.type); if(g.colors && !(it.colors||[]).length) it.colors = g.colors;
+  m.picked = k; s.webPhoto = null; m.photoBusy = !!r.image; modal.paint();
+  const ph = r.image ? await webPhoto(r.image) : "";
+  if(modal.state !== s) return;
+  m.photoBusy = false; if(ph) s.webPhoto = ph; modal.paint();
+  toast("Fiche remplie avec ce produit. Vérifie avant d'enregistrer.");
+}
+
 /* ---------- Navigation ---------- */
 const TABS = [["accueil","Accueil"],["dressing","Dressing"],["tenues","Tenues"],["envies","Envies"],["styliste","Styliste"]];
 const SIDE_TABS = [["accueil","Accueil"],["jour","Aujourd'hui"],["dressing","Dressing"],["tenues","Tenues"],["envies","Envies"],["styliste","Styliste"],["revente","Revente"]];
@@ -2319,6 +2387,7 @@ function mEdit(s){
     ${!lai.on && !lai.asked && !ai ? `<div class="banner"><span><b>Reconnaître le type automatiquement ?</b> L'IA propose hoodie, jean, baskets… à partir de la photo, sur ton téléphone. Téléchargement unique de 61 Mo (Wi-Fi conseillé).</span><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="lai-no">Non merci</button><button class="btn sm primary" data-act="lai-yes">Activer</button></div></div>` : ""}
     <div class="field"><span class="lab">Type</span>${typeTiles(it, s)}</div>
     <div class="field"><span class="lab">Couleurs (la première est la dominante)</span>${chipsField("colors", COLOR_LABEL, it.colors)}</div>
+    ${matchBlock(s)}
     <div class="field"><label for="ed-name">Nom <span class="muted" style="font-weight:400">(facultatif)</span></label><input class="input" id="ed-name" value="${esc(it.name)}" placeholder="${esc(auto)}"></div>
     <details class="more" data-k="moreOpen" ${s.moreOpen ? "open" : ""}><summary>Plus de détails <span class="muted">marque, taille, prix, saisons, style</span></summary>
       <div class="field"><label for="ed-brand">Marque</label><input class="input" id="ed-brand" value="${esc(it.brand)}"></div>
@@ -2557,6 +2626,7 @@ document.addEventListener("click", async e => {
     case "bz-undo": s.rects.pop(); modal.paint(); break;
     case "ed-link": itemFromLink(s); break;
     case "ed-paste": pasteImage(s); break;
+    case "m-pick": pickMatch(s, +v); break;
     case "ed-pickimg": { readEditFields(s); const k = +v, use = s.item.photo===s.webPhoto; s.pickBusy = k; modal.paint();
       const ph = await webPhoto(s.webImages[k]); if(modal.state!==s) break; s.pickBusy = null;
       if(ph){ s.pickedImg = k; s.webPhoto = ph; if(use) s.item.photo = ph; } else toast("Cette photo n'est pas récupérable, choisis-en une autre.");
@@ -2696,6 +2766,7 @@ document.addEventListener("input", e => {
   else if(t.id==="shop-q"){ ui.shop.q = t.value; }
   else if(t.id==="chat-q"){ chat.draft = t.value; t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; }
   else if(t.id==="wx-q"){ wx.q = t.value; }
+  else if(t.id==="m-q"){ const st = modal.state; if(st) st.match = {...(st.match||{}), q:t.value}; }
   else if(t.id==="cut-brush"){ modal.state.brush = +t.value; }
   else if(t.id==="wi-zoom"){ const c = modal.state.crop; if(c){ c.z = +t.value/100; const img = $("#crop-img"); if(img) img.style.cssText = cropGeom(c).css; const o = $("#wi-zoom-v"); if(o) o.textContent = t.value + " %"; } }
   else if(t.id==="lib-q"){ const s = modal.state; s.q = t.value; s.matches = null; const pos = t.selectionStart; modal.paint(); const n=$("#lib-q"); n.focus(); n.setSelectionRange(pos,pos); }
@@ -2703,6 +2774,7 @@ document.addEventListener("input", e => {
 document.addEventListener("submit", e => {
   const f = e.target.dataset.form;
   if(f==="gate"){ e.preventDefault(); gateSubmit(); }
+  else if(f==="match"){ e.preventDefault(); document.activeElement?.blur(); runMatch(modal.state); }
   else if(f==="chat"){ e.preventDefault(); const q = $("#chat-q")?.value || ""; askStylist(q); }
 });
 document.addEventListener("keydown", e => {
