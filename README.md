@@ -8,7 +8,7 @@ Prototype de dressing numérique : une application web mobile, installable. Tout
 - Installation : Safari → Partager → « Sur l'écran d'accueil » (iPhone), ou menu → « Installer l'application » (Android/Chrome).
 - Météo : prévision du jour via Open-Meteo (gratuit, sans clé).
 - IA gratuite sur l'appareil : détourage (U²-Net, 5 Mo, toujours actif) et reconnaissance du type de vêtement (Marqo-FashionSigLIP, 61 Mo, à activer), sans compte ni envoi de photo. Voir `ai/README.md`.
-- Sans compte ni clé : détourage IA sur l'appareil (U²-Net) avec retouche au doigt, détection des couleurs, scan en lot en entourant chaque pièce, styliste à base de règles.
+- Sans compte ni clé : détourage IA sur l'appareil (U²-Net) avec retouche au doigt, finition studio (pièce redressée, centrée sur fond blanc, couleurs et lumière équilibrées, ombre douce), guide de prise de vue, détection des couleurs, scan en lot en entourant chaque pièce, styliste à base de règles.
 - Avec une clé API Claude (facultative, dans Réglages) : reconnaissance du type de vêtement, scan en lot automatique, styliste en conversation libre, recherche en boutique en direct.
 
 ## Mise en place de Supabase (une seule fois)

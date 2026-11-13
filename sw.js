@@ -4,7 +4,7 @@
    - Photos des comptes (liens signés Supabase) : cache par photo, utilisable hors ligne.
    - Modèles d'IA : gérés par l'app dans le cache « cintre-ai-… », conservé entre les versions.
    - Météo et API Claude : jamais mises en cache (toujours en direct). */
-const VERSION = "cintre-v12";
+const VERSION = "cintre-v13";
 const SHELL = ["./", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 const CACHED_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com", "cdn.jsdelivr.net"];
 
